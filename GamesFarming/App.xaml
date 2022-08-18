@@ -1,0 +1,15 @@
+﻿<Application x:Class="GamesFarming.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:GamesFarming"
+             >
+    <Application.Resources>
+        <ResourceDictionary >
+            <SolidColorBrush x:Key="Background" Color="#CFCFCF"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/TextBlockThemes.xaml"/>
+                <ResourceDictionary Source="Themes/TextBoxThemes.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
