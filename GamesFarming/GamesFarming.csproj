@@ -82,6 +82,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataBase\Account.cs" />
+    <Compile Include="DataBase\ApplicationContext.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -112,9 +114,8 @@
     </Compile>
     <Compile Include="MVVM\Models\LaunchArgument.cs" />
     <Compile Include="MVVM\Models\ProcessStarter.cs" />
-    <Compile Include="MVVM\Models\Account.cs" />
+    <Compile Include="MVVM\Models\SteamAccount.cs" />
     <Compile Include="MVVM\Models\Resolution.cs" />
-    <Compile Include="MVVM\Models\SteamGameLauncher.cs" />
     <Compile Include="MVVM\Stores\NavigationStore.cs" />
     <Compile Include="MVVM\ViewModels\AccountRegistrationVM.cs" />
     <Compile Include="MVVM\ViewModels\MainWindowVM.cs" />
@@ -138,6 +139,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="DataBase\FarmingDB.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

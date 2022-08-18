@@ -1,19 +1,42 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace GamesFarming.MVVM.Models
 {
     internal class ProcessStarter
     {
-        internal static class ProgramStarter
+        private ProcessStartInfo process;
+        public string Path { get; private set; }
+
+        public ProcessStarter(string filePath)
         {
-            public static void Start(string path, string args = "")
+            Path = filePath;
+            ProcessStartInfo process = new ProcessStartInfo();
+            process.FileName = Path;
+        }
+
+        public void MultipleStart(IEnumerable<LaunchArgument> args)
+        {
+            foreach(var argument in args)
             {
-                ProcessStartInfo process = new ProcessStartInfo();
-                process.FileName = path;
-                process.Arguments = args;
+                Start(argument);
+            }
+        }
+
+        public void Start(LaunchArgument arg)
+        {
+            try
+            {
+                process.Arguments = arg.ToString();
                 Process.Start(process);
             }
-
+            catch(Exception ex)
+            {
+                throw new Exception($"Failed to start new process : Path {Path} || Argument : {arg} || Message : {ex.Message}");
+            }
         }
+
     }
 }

@@ -1,5 +1,7 @@
-﻿using GamesFarming.MVVM.Base;
+﻿using GamesFarming.DataBase;
+using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
+using System;
 using System.Windows;
 using System.Windows.Input;
 
@@ -7,6 +9,9 @@ namespace GamesFarming.MVVM.ViewModels
 {
     internal class AccountRegistrationVM :ViewModelBase
     {
+        private readonly ApplicationContext _context;
+
+
         private string _login;
 
         public string Login
@@ -40,14 +45,24 @@ namespace GamesFarming.MVVM.ViewModels
         }
 
         public ICommand Register { get; set; }
-        public AccountRegistrationVM()
+        public AccountRegistrationVM(ApplicationContext context)
         {
+            _context = context;
             Register = new RelayCommand(() => RegisterAccount());
         }
 
         public void RegisterAccount()
         {
-            MessageBox.Show("Congrats!");
+            Account account = new Account(Login, Password, 440, Optimize? 1: 0, 300, 300);
+            //try
+            //{
+                _context.AddAccount(account);
+                //MessageBox.Show("Congrats!");
+            //}
+            //catch(Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
         }
     }
 

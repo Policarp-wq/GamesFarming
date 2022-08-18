@@ -1,4 +1,6 @@
-﻿using GamesFarming.MVVM.ViewModels;
+﻿using GamesFarming.DataBase;
+using GamesFarming.MVVM.ViewModels;
+using System;
 using System.Windows;
 
 namespace GamesFarming
@@ -10,9 +12,24 @@ namespace GamesFarming
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            MainWindow = new MainWindow() { DataContext = new AccountRegistrationVM() };
+            ApplicationContext context = CreateAppContext();
+            MainWindow = new MainWindow() { DataContext = new AccountRegistrationVM(context) };
             MainWindow.Show();
             base.OnStartup(e);
+        }
+
+        private ApplicationContext CreateAppContext()
+        {
+            try
+            {
+                ApplicationContext context = new ApplicationContext();
+                return context;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                throw ex;
+            }
         }
     }
 }
