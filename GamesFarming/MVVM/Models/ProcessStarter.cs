@@ -7,14 +7,14 @@ namespace GamesFarming.MVVM.Models
 {
     internal class ProcessStarter
     {
-        private ProcessStartInfo process;
+        private ProcessStartInfo _process;
         public string Path { get; private set; }
 
         public ProcessStarter(string filePath)
         {
             Path = filePath;
-            ProcessStartInfo process = new ProcessStartInfo();
-            process.FileName = Path;
+            _process = new ProcessStartInfo();
+            _process.FileName = Path;
         }
 
         public void MultipleStart(IEnumerable<LaunchArgument> args)
@@ -29,8 +29,8 @@ namespace GamesFarming.MVVM.Models
         {
             try
             {
-                process.Arguments = arg.ToString();
-                Process.Start(process);
+                _process.Arguments = arg.ToString();
+                Process.Start(_process);
             }
             catch(Exception ex)
             {

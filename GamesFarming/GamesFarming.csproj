@@ -96,6 +96,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MVVM\Views\AccountsListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\TextBlockThemes.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -112,15 +116,22 @@
     <Compile Include="MVVM\CustomUI\FieldWithName.xaml.cs">
       <DependentUpon>FieldWithName.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MVVM\Models\AccountPresentation.cs" />
+    <Compile Include="MVVM\Models\FarmingStarter.cs" />
     <Compile Include="MVVM\Models\LaunchArgument.cs" />
     <Compile Include="MVVM\Models\ProcessStarter.cs" />
     <Compile Include="MVVM\Models\SteamAccount.cs" />
     <Compile Include="MVVM\Models\Resolution.cs" />
+    <Compile Include="MVVM\Models\ThreadHandler.cs" />
     <Compile Include="MVVM\Stores\NavigationStore.cs" />
     <Compile Include="MVVM\ViewModels\AccountRegistrationVM.cs" />
+    <Compile Include="MVVM\ViewModels\AccountsListVM.cs" />
     <Compile Include="MVVM\ViewModels\MainWindowVM.cs" />
     <Compile Include="MVVM\Views\AccountRegistrationView.xaml.cs">
       <DependentUpon>AccountRegistrationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\Views\AccountsListView.xaml.cs">
+      <DependentUpon>AccountsListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

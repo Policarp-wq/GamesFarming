@@ -1,4 +1,5 @@
 ﻿using GamesFarming.DataBase;
+using GamesFarming.MVVM.Stores;
 using GamesFarming.MVVM.ViewModels;
 using System;
 using System.Windows;
@@ -13,7 +14,9 @@ namespace GamesFarming
         protected override void OnStartup(StartupEventArgs e)
         {
             ApplicationContext context = CreateAppContext();
-            MainWindow = new MainWindow() { DataContext = new AccountRegistrationVM(context) };
+            NavigationStore navigationStore = new NavigationStore();
+            navigationStore.CurrentVM = new AccountsListVM(navigationStore, context);
+            MainWindow = new MainWindow() { DataContext = new MainWindowVM(navigationStore, context)};
             MainWindow.Show();
             base.OnStartup(e);
         }

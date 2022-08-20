@@ -6,6 +6,7 @@
     <Application.Resources>
         <ResourceDictionary >
             <SolidColorBrush x:Key="Background" Color="#CFCFCF"/>
+            <SolidColorBrush x:Key="Primary" Color="#F8FEFF"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/TextBlockThemes.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxThemes.xaml"/>

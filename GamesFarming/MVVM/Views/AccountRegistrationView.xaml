@@ -6,9 +6,9 @@
              xmlns:local="clr-namespace:GamesFarming.MVVM.Views"
              mc:Ignorable="d" 
              xmlns:custom="clr-namespace:GamesFarming.MVVM.CustomUI"
-             d:DesignHeight="500" d:DesignWidth="800"
+             d:DesignHeight="550" d:DesignWidth="800"
              FontSize="24"
-             Background="AliceBlue">
+             Background="{StaticResource Primary}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="165"/>
@@ -19,6 +19,7 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="auto"/>
             <RowDefinition />
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
@@ -61,15 +62,15 @@
             <StackPanel Grid.Column="1" Grid.Row="2"
                         Orientation="Horizontal">
                 <TextBox Style="{StaticResource CoolTextBox}"
-                         Text="300"/>
+                         Text="{Binding ResX}"/>
                 <TextBox Style="{StaticResource CoolTextBox}"
-                         Text="300"/>
+                         Text="{Binding ResY}"/>
             </StackPanel>
 
             <TextBlock Grid.Column="0" Grid.Row="3"
                 Text="Config" Style="{StaticResource Sign}"/>
             <TextBox Grid.Column="1" Grid.Row="3" 
-                     Text="Bot3"
+                     Text="{Binding ConfigName}"
                      Style="{StaticResource CoolTextBox}"/>
 
             <TextBlock Grid.Column="0" Grid.Row="4"
@@ -101,5 +102,11 @@
                 MaxHeight="50"
                 MaxWidth="350"
                 Command="{Binding Register}"/>
+        <Button Grid.Column="1" Grid.Row="4"
+                Content="Start farming"
+                Margin="10"
+                MaxHeight="50"
+                MaxWidth="350"
+                Command="{Binding Start}"/>
     </Grid>
 </UserControl>

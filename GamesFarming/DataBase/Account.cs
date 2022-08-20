@@ -27,5 +27,16 @@ namespace GamesFarming.DataBase
             ResX = resX;
             ResY = resY;
         }
+
+        //public Account(Account account)
+        //{
+        //    ID = account.ID;
+        //    Login = account.Login;
+        //    Password = account.Password;
+        //    GameCode = account.GameCode;
+        //    Optimize = account.Optimize;
+        //    ResX = account.ResX;
+        //    ResY = account.ResY;
+        //}
     }
 }
