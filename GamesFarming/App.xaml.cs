@@ -1,7 +1,12 @@
 ﻿using GamesFarming.DataBase;
+using GamesFarming.MVVM.Models;
 using GamesFarming.MVVM.Stores;
 using GamesFarming.MVVM.ViewModels;
+using GamesFarming.User;
+using Microsoft.Win32;
 using System;
+using System.IO;
+using System.Threading;
 using System.Windows;
 
 namespace GamesFarming
@@ -11,26 +16,28 @@ namespace GamesFarming
     /// </summary>
     public partial class App : Application
     {
+        public static string UserFileName = "UserData.txt";
+        public static string UserDataDirectory = @".";
         protected override void OnStartup(StartupEventArgs e)
-        {
-            ApplicationContext context = CreateAppContext();
-            NavigationStore navigationStore = new NavigationStore();
-            navigationStore.CurrentVM = new AccountsListVM(navigationStore, context);
-            MainWindow = new MainWindow() { DataContext = new MainWindowVM(navigationStore, context)};
-            MainWindow.Show();
-            base.OnStartup(e);
-        }
-
-        private ApplicationContext CreateAppContext()
         {
             try
             {
-                ApplicationContext context = new ApplicationContext();
-                return context;
+                if (!UserSettings.ContainsSteamPath)
+                {
+                    OpenFileDialog openFileDialog = new OpenFileDialog();
+                    openFileDialog.Title = "Select steam.exe";
+                    openFileDialog.ShowDialog();
+                    UserSettings.SetSteamPath(openFileDialog.FileName);
+                }
+                NavigationStore navigationStore = new NavigationStore();
+                navigationStore.CurrentVM = new AccountsListVM();
+                MainWindow = new MainWindow() { DataContext = new MainWindowVM(navigationStore) };
+                MainWindow.Show();
+                base.OnStartup(e);
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Ошибка запуска приложения! : " + ex.Message + ex.InnerException.Message);
                 throw ex;
             }
         }

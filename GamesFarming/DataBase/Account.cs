@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GamesFarming.DataBase
+﻿namespace GamesFarming.DataBase
 {
-    internal class Account
+    public class Account
     {
         public int ID { get; set; }
         public string Login { get; set; }
@@ -28,15 +22,20 @@ namespace GamesFarming.DataBase
             ResY = resY;
         }
 
-        //public Account(Account account)
-        //{
-        //    ID = account.ID;
-        //    Login = account.Login;
-        //    Password = account.Password;
-        //    GameCode = account.GameCode;
-        //    Optimize = account.Optimize;
-        //    ResX = account.ResX;
-        //    ResY = account.ResY;
-        //}
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as Account;
+            if(other is null)
+                return false;
+            return other.GetHashCode() == GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            int p = 239;
+            int mod = 100000007;
+            return ((Login.GetHashCode() % mod + Password.GetHashCode() % mod) * (GameCode ^ p) % mod) % mod;
+        }
     }
 }

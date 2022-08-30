@@ -2,22 +2,17 @@
 using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
 using GamesFarming.MVVM.Models;
-using GamesFarming.MVVM.Stores;
-using System;
+using GamesFarming.User;
+using Microsoft.Win32;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace GamesFarming.MVVM.ViewModels
 {
     internal class AccountsListVM : ViewModelBase
     {
-        private NavigationStore _navigationStore;
-        private ApplicationContext _context;
         private ObservableCollection<AccountPresentation> _accounts;
 
         public ObservableCollection<AccountPresentation> Accounts
@@ -43,19 +38,26 @@ namespace GamesFarming.MVVM.ViewModels
         }
 
         public ICommand Start { get; set; }
-        public AccountsListVM(NavigationStore navigationStore, ApplicationContext context)
+        public AccountsListVM()
         {
-            _navigationStore = navigationStore;
-            _context = context;
-            Accounts = new ObservableCollection<AccountPresentation>( _context.Accounts.ToList().Select(x => new AccountPresentation(x))); // in thread
+            Accounts = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x))); // in thread
             Start = new RelayCommand(() => OnStart());
         }
 
+        public IEnumerable<Account> SelectedAccounts => Accounts.Where(x => x.Selected)
+                                                                     .Select(x => x.Account);
+
         public void OnStart()
         {
-            FarmingStarter.StartFarming(@"H:\Program Files (x86)\Steam\steam.exe",
-                Accounts.Where(x => x.Selected)
-                .Select(x => x.Account));
+            FarmingStarter.StartFarming(UserSettings.SteamPath,
+                SelectedAccounts);
+        }
+
+        public void DeleteAccounts()
+        {
+            JsonDB.DeleteFromDB(SelectedAccounts);
+            OnPropertyChanged(nameof(Accounts));
+            OnPropertyChanged(nameof(SelectedAccounts));
         }
     }
 }

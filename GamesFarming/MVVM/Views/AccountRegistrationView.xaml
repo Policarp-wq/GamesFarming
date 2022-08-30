@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:GamesFarming.MVVM.Views"
              mc:Ignorable="d" 
              xmlns:custom="clr-namespace:GamesFarming.MVVM.CustomUI"
-             d:DesignHeight="550" d:DesignWidth="800"
              FontSize="24"
              Background="{StaticResource Primary}">
     <Grid>
@@ -56,10 +55,16 @@
             <TextBox Grid.Column="1" Grid.Row="1" 
                      Text="{Binding Password}"
                      Style="{StaticResource CoolTextBox}"/>
-
+            
             <TextBlock Grid.Column="0" Grid.Row="2"
+                Text="Game code" Style="{StaticResource Sign}"/>
+            <TextBox Grid.Column="1" Grid.Row="2" 
+                     Text="{Binding GameCode}"
+                     Style="{StaticResource CoolTextBox}"/>
+
+            <TextBlock Grid.Column="0" Grid.Row="3"
                 Text="Game resolution" Style="{StaticResource Sign}"/>
-            <StackPanel Grid.Column="1" Grid.Row="2"
+            <StackPanel Grid.Column="1" Grid.Row="3"
                         Orientation="Horizontal">
                 <TextBox Style="{StaticResource CoolTextBox}"
                          Text="{Binding ResX}"/>
@@ -67,15 +72,15 @@
                          Text="{Binding ResY}"/>
             </StackPanel>
 
-            <TextBlock Grid.Column="0" Grid.Row="3"
+            <TextBlock Grid.Column="0" Grid.Row="4"
                 Text="Config" Style="{StaticResource Sign}"/>
-            <TextBox Grid.Column="1" Grid.Row="3" 
+            <TextBox Grid.Column="1" Grid.Row="4" 
                      Text="{Binding ConfigName}"
                      Style="{StaticResource CoolTextBox}"/>
 
-            <TextBlock Grid.Column="0" Grid.Row="4"
+            <TextBlock Grid.Column="0" Grid.Row="5"
                 Text="Optimize" Style="{StaticResource Sign}"/>
-            <Viewbox Grid.Column="1" Grid.Row="4"
+            <Viewbox Grid.Column="1" Grid.Row="5"
                      Height="40"
                      Width="40"
                      HorizontalAlignment="Left"
@@ -84,17 +89,6 @@
                     IsChecked="{Binding Optimize}"/>
             </Viewbox>
 
-            <TextBlock Grid.Column="0" Grid.Row="5"
-                Text="Windowed" Style="{StaticResource Sign}"/>
-            <Viewbox Grid.Column="1" Grid.Row="5"
-                     Height="40"
-                     Width="40"
-                     HorizontalAlignment="Left"
-                     Margin="5">
-                <CheckBox
-                    IsChecked="{Binding Windowed}"/>
-            </Viewbox>
-            
         </Grid>
         <Button Grid.Column="1" Grid.Row="3"
                 Content="Create an account"
@@ -102,11 +96,5 @@
                 MaxHeight="50"
                 MaxWidth="350"
                 Command="{Binding Register}"/>
-        <Button Grid.Column="1" Grid.Row="4"
-                Content="Start farming"
-                Margin="10"
-                MaxHeight="50"
-                MaxWidth="350"
-                Command="{Binding Start}"/>
     </Grid>
 </UserControl>

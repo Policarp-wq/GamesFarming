@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         xmlns:views="clr-namespace:GamesFarming.MVVM.Views"
         xmlns:viewmodels="clr-namespace:GamesFarming.MVVM.ViewModels"
-        Title="MainWindow" Height="600" Width="800">
+        FontSize="22"
+        Title="MainWindow" Height="800" Width="1000">
     <Grid>
         <Grid.Resources>
             <DataTemplate DataType="{x:Type viewmodels:AccountRegistrationVM}">
@@ -21,7 +22,7 @@
 
         </Grid.Resources>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
             <ColumnDefinition Width="15"/>
         </Grid.ColumnDefinitions>
@@ -30,6 +31,17 @@
             <RowDefinition/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
+        <StackPanel Grid.Row="1"
+                    Grid.Column="0"
+            Orientation="Vertical">
+            <Button Margin="15"
+                Content="To registration"
+                    Command="{Binding MoveToRegistration}"/>
+            <Button Margin="15"
+                Content="To accounts"
+                    Command="{Binding MoveToAccounts}"/>
+        </StackPanel>
+        
         <ContentControl Grid.Column="1" Grid.Row="1"
                  Content="{Binding CurrentVM}"/>
     </Grid>
