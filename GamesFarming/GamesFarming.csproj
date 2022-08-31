@@ -110,6 +110,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DataBase\JsonDB.cs" />
+    <Compile Include="MVVM\Models\FileSafeAccess.cs" />
     <Compile Include="User\UserSettings.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

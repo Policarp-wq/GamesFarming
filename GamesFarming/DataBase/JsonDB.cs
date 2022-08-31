@@ -1,12 +1,8 @@
 ﻿using GamesFarming.MVVM.Models;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GamesFarming.DataBase
 {
@@ -17,16 +13,7 @@ namespace GamesFarming.DataBase
         public static string DBPath => FolderPath + UsersFileName;
         static JsonDB()
         {
-            FolderPath = Path.GetTempPath();
-            ThreadHandler.StartInThread(CheckUsersDB);
-        }
-
-        private static void CheckUsersDB()
-        {
-            if(!File.Exists(DBPath))
-            {
-                File.CreateText(DBPath);
-            }
+            FolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
         }
 
         public static void WriteToDB(Account account)
@@ -35,8 +22,8 @@ namespace GamesFarming.DataBase
             serializedAccounts.Add(account);
 
             string serializedUsers = JsonConvert.SerializeObject(serializedAccounts);
-            File.WriteAllText(DBPath, serializedUsers);
-            
+            Write(serializedUsers);
+
         }
         public static void WriteToDB(IEnumerable<Account> accounts)
         {
@@ -44,13 +31,13 @@ namespace GamesFarming.DataBase
             serializedAccounts.AddRange(accounts);
 
             string serializedUsers = JsonConvert.SerializeObject(accounts);
-            File.WriteAllText(serializedUsers, DBPath);
-            
+            Write(serializedUsers);
+
         }
 
         public static List<Account> GetAcounts()
         {
-            string serializedUsers = File.ReadAllText(DBPath);
+            string serializedUsers = Read();
             List<Account> accounts = JsonConvert.DeserializeObject<List<Account>>(serializedUsers);
             if (accounts is null)
                 return Enumerable.Empty<Account>().ToList();
@@ -60,14 +47,18 @@ namespace GamesFarming.DataBase
         public static void DeleteFromDB(string login)
         {
             var accounts = GetAcounts();
-            accounts.Remove(accounts.FirstOrDefault(acc => acc.Login == login));
-            WriteToDB(accounts);
+            accounts.Remove(accounts.FirstOrDefault(acc => acc.Login.Equals(login)));
+
+            string serializedUsers = JsonConvert.SerializeObject(accounts);
+            Write(serializedUsers);
         }
         public static void DeleteFromDB(IEnumerable<Account> deleteAccounts)
         {
             var accounts = GetAcounts();
             accounts.RemoveAll(acc => deleteAccounts.Contains(acc));
-            WriteToDB(accounts);
+
+            string serializedUsers = JsonConvert.SerializeObject(accounts);
+            Write(serializedUsers);
         }
 
         public static void DeleteFromDB(IEnumerable<string> logins)
@@ -75,6 +66,17 @@ namespace GamesFarming.DataBase
             var accounts = GetAcounts();
             accounts.RemoveAll(acc => logins.Contains(acc.Login));
             WriteToDB(accounts);
+        }
+        private static void Write(string text)
+        {
+            FileSafeAccess.WriteToFile(DBPath, text);
+        }
+        private static string Read()
+        {
+            var str = FileSafeAccess.ReadFile(DBPath);
+            if (str is null)
+                return "";
+            return str;
         }
     }
 

@@ -30,14 +30,14 @@ namespace GamesFarming
                     UserSettings.SetSteamPath(openFileDialog.FileName);
                 }
                 NavigationStore navigationStore = new NavigationStore();
-                navigationStore.CurrentVM = new AccountsListVM();
+                navigationStore.CurrentVM = new AccountRegistrationVM();
                 MainWindow = new MainWindow() { DataContext = new MainWindowVM(navigationStore) };
                 MainWindow.Show();
                 base.OnStartup(e);
             }
             catch(Exception ex)
             {
-                MessageBox.Show("Ошибка запуска приложения! : " + ex.Message + ex.InnerException.Message);
+                MessageBox.Show("Ошибка запуска приложения! : " + ex.Message);
                 throw ex;
             }
         }

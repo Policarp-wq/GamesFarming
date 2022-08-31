@@ -38,10 +38,12 @@ namespace GamesFarming.MVVM.ViewModels
         }
 
         public ICommand Start { get; set; }
+        public ICommand Delete { get; set; }
         public AccountsListVM()
         {
             Accounts = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x))); // in thread
             Start = new RelayCommand(() => OnStart());
+            Delete = new RelayCommand(() => DeleteAccounts());
         }
 
         public IEnumerable<Account> SelectedAccounts => Accounts.Where(x => x.Selected)
@@ -49,13 +51,14 @@ namespace GamesFarming.MVVM.ViewModels
 
         public void OnStart()
         {
-            FarmingStarter.StartFarming(UserSettings.SteamPath,
+            FarmingStarter.StartFarming(UserSettings.GetSteamPath(),
                 SelectedAccounts);
         }
 
         public void DeleteAccounts()
         {
             JsonDB.DeleteFromDB(SelectedAccounts);
+            Accounts = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x)));
             OnPropertyChanged(nameof(Accounts));
             OnPropertyChanged(nameof(SelectedAccounts));
         }
