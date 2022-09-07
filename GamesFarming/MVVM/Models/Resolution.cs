@@ -1,7 +1,12 @@
 ﻿namespace GamesFarming.MVVM.Models
 {
-    internal class Resolution
+    public class Resolution
     {
+        public const int DefaultWidth = 300;
+        public const int DefaultHeight = 300;
+
+        public static Resolution Default = new Resolution(DefaultHeight, DefaultWidth);
+
         public readonly int Width;
         public readonly int Height;
 

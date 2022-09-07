@@ -1,4 +1,6 @@
-﻿namespace GamesFarming.DataBase
+﻿using GamesFarming.MVVM.Models;
+
+namespace GamesFarming.DataBase
 {
     public class Account
     {
@@ -6,26 +8,32 @@
         public string Login { get; set; }
         public string Password { get; set; }
         public int GameCode { get; set; }
-        public int Optimize { get; set; }
-        public int ResX { get; set; }
-        public int ResY { get; set; }
+        public string Optimization { get; set; }
+        public Resolution Resolution { get; set; }
+        public string Cfg { get; set; }
+        public Connection Connect { get; set; }
 
-        public Account() { }
+        private Account() { }
 
-        public Account(string login, string password, int gameCode, int optimize, int resX, int resY)
+        public Account(string login, string password, int gameCode, int width, int height, string optimize = LaunchArgument.DefaultOptimization)
         {
             Login = login;
             Password = password;
             GameCode = gameCode;
-            Optimize = optimize;
-            ResX = resX;
-            ResY = resY;
+            Optimization = optimize;
+            Resolution = new Resolution(width, height);
         }
 
+        public Account(string login, string password, int gameCode, Resolution resolution, string optimize = LaunchArgument.DefaultOptimization)
+            : this(login, password, gameCode, resolution.Width, resolution.Height, optimize) { }
 
+        public override string ToString()
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
         public override bool Equals(object obj)
         {
-            var other = obj as Account;
+            Account other = obj as Account;
             if(other is null)
                 return false;
             return other.GetHashCode() == GetHashCode();

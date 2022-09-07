@@ -18,6 +18,8 @@ namespace GamesFarming.DataBase
 
         public static void WriteToDB(Account account)
         {
+            if(account is null)
+                return;
             var serializedAccounts = GetAcounts();
             serializedAccounts.Add(account);
 
@@ -28,7 +30,7 @@ namespace GamesFarming.DataBase
         public static void WriteToDB(IEnumerable<Account> accounts)
         {
             var serializedAccounts = GetAcounts();
-            serializedAccounts.AddRange(accounts);
+            serializedAccounts.AddRange(accounts.Where(a => !(a is null)));
 
             string serializedUsers = JsonConvert.SerializeObject(accounts);
             Write(serializedUsers);

@@ -2,10 +2,7 @@
 using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
 using GamesFarming.MVVM.Models;
-using GamesFarming.MVVM.Stores;
-using Microsoft.Win32;
 using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -110,7 +107,8 @@ namespace GamesFarming.MVVM.ViewModels
         {
             try
             {
-                Account account = new Account(Login, Password, int.Parse(GameCode), Optimize? 1: 0, int.Parse(ResX), int.Parse(ResY));
+                Account account = new Account(Login, Password, int.Parse(GameCode), int.Parse(ResX), int.Parse(ResY), Optimize? LaunchArgument.DefaultOptimization: "");
+                account.Cfg = ConfigName;
                 JsonDB.WriteToDB(account);
                 MessageBox.Show("Succesful!");
             }

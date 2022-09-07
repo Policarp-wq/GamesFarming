@@ -4,27 +4,24 @@ namespace GamesFarming.MVVM.Models
 {
     internal class LaunchArgument
     {
-        private const string Optimization = "-novid - nosound - low - nojoy - noshader - nofbo - nodcaudio - nomsaa + set vid level 0";
-        private string _optimize => OptimizeWindow == 1 ? Optimization : "";
+        public const string DefaultOptimization = "-novid - nosound - low - nojoy - noshader - nofbo - nodcaudio - nomsaa + set vid level 0";
+        private string _connect => Account.Connect is null? "" : Account.Connect.ToString();
+        private string _cfg => Account.Cfg is null? "" : Account.Cfg;
+
+        public static int DefaultCode = 730;
 
         public Account Account { get; set; }
-        public int GameCode { get; set; }
         public Resolution Resolution { get; set; }
-        public string CfgName { get; set; }
-        public int OptimizeWindow { get; set; }
 
         public LaunchArgument(Account account)
         {
             Account = account;
-            GameCode = account.GameCode;
-            OptimizeWindow = account.Optimize;
-            CfgName = "";
-            Resolution = new Resolution(account.ResX, account.ResY);
+            Resolution = account.Resolution;
         }
 
         public override string ToString()
         {
-            return $"-silent -login {Account.Login} {Account.Password} -applaunch {GameCode} _windowed -w {Resolution.Width} -h {Resolution.Height} +exec {CfgName} {_optimize}"
+            return $"-silent -login {Account.Login} {Account.Password} -applaunch {Account.GameCode} _windowed -w {Resolution.Width} -h {Resolution.Height} +exec {_cfg} {_connect} {Account.Optimization}"
                     + $"echo | set / p = {Account.Login}| clip";
         }
     }
