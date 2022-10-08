@@ -1,9 +1,4 @@
 ﻿using GamesFarming.DataBase;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GamesFarming.MVVM.Models
 {
@@ -13,6 +8,7 @@ namespace GamesFarming.MVVM.Models
         public bool Selected { get; set; }
         public string Login => Account.Login;
         public int GameCode => Account.GameCode;
+        public string LastLaunchDate => Account.LastLaunchDate.ToShortDateString();
 
         public AccountPresentation(Account account)
         {

@@ -5,6 +5,7 @@ using GamesFarming.MVVM.ViewModels;
 using GamesFarming.User;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -28,6 +29,12 @@ namespace GamesFarming
                     openFileDialog.Title = "Select steam.exe";
                     openFileDialog.ShowDialog();
                     UserSettings.SetSteamPath(openFileDialog.FileName);
+                }
+                if (!UserSettings.ContainsMAFilesPath)
+                {
+                    var folderBrowser = new System.Windows.Forms.FolderBrowserDialog();
+                    folderBrowser.ShowDialog();
+                    UserSettings.SetMAFilesPath(folderBrowser.SelectedPath);
                 }
                 NavigationStore navigationStore = new NavigationStore();
                 navigationStore.CurrentVM = new AccountRegistrationVM();

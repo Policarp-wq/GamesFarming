@@ -110,6 +110,8 @@ namespace GamesFarming.MVVM.ViewModels
                 Account account = new Account(Login, Password, int.Parse(GameCode), int.Parse(ResX), int.Parse(ResY), Optimize? LaunchArgument.DefaultOptimization: "");
                 account.Cfg = ConfigName;
                 JsonDB.WriteToDB(account);
+                Login = "";
+                Password = "";
                 MessageBox.Show("Succesful!");
             }
             catch (Exception ex)

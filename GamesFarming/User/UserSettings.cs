@@ -9,14 +9,19 @@ namespace GamesFarming.User
         private class Settings
         {
             public string SteamPath = "";
+            public string MAFilesPath = "";
 
         }
         private static Settings _settings;
 
         public static string SettingsName = "UserSettings";
+        public static string MAFilesName = "MAFilesPathHolder.txt";
+
         public static string SettingsFolder;
         public static string SettingsPath => SettingsFolder + SettingsName;
+        public static string MAFilesPathHolder => SettingsFolder + MAFilesName;
         public static bool ContainsSteamPath => GetSteamPath().Length > 0;
+        public static bool ContainsMAFilesPath => GetMAFilesPath().Length > 0;
 
 
         static UserSettings()
@@ -29,6 +34,14 @@ namespace GamesFarming.User
         {
             _settings.SteamPath = steamPath;
             Save();
+        }
+        public static void SetMAFilesPath(string maFilesFolderPath)
+        {
+            FileSafeAccess.WriteToFile(MAFilesPathHolder, maFilesFolderPath);
+        }
+        public static string GetMAFilesPath()
+        {
+            return FileSafeAccess.ReadFile(MAFilesPathHolder);
         }
 
         public static string GetSteamPath() => _settings.SteamPath;
@@ -47,6 +60,7 @@ namespace GamesFarming.User
                 return new Settings();
             return settings;
         }
+        
         private static string Read()
         {
             var serialized = FileSafeAccess.ReadFile(SettingsPath);

@@ -24,8 +24,12 @@
                   >
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Login" DisplayMemberBinding="{Binding Login}"/>
-                    <GridViewColumn Header="Game code" DisplayMemberBinding="{Binding GameCode}"/>
+                    <GridViewColumn Header="Login" 
+                                    DisplayMemberBinding="{Binding Login}"/>
+                    <GridViewColumn Header="Game code"
+                                    DisplayMemberBinding="{Binding GameCode}"/>
+                    <GridViewColumn Header="Last launch"
+                                    DisplayMemberBinding="{Binding LastLaunchDate}"/>
                 </GridView>
             </ListView.View>
             <ListView.Resources>

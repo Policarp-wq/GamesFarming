@@ -1,4 +1,5 @@
 ﻿using GamesFarming.MVVM.Models;
+using System;
 
 namespace GamesFarming.DataBase
 {
@@ -12,6 +13,7 @@ namespace GamesFarming.DataBase
         public Resolution Resolution { get; set; }
         public string Cfg { get; set; }
         public Connection Connect { get; set; }
+        public DateTime LastLaunchDate { get; set; }
 
         private Account() { }
 
@@ -22,6 +24,7 @@ namespace GamesFarming.DataBase
             GameCode = gameCode;
             Optimization = optimize;
             Resolution = new Resolution(width, height);
+            LastLaunchDate = DateTime.Now;
         }
 
         public Account(string login, string password, int gameCode, Resolution resolution, string optimize = LaunchArgument.DefaultOptimization)

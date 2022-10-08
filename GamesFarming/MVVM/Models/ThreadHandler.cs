@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace GamesFarming.MVVM.Models
 {
@@ -13,6 +10,20 @@ namespace GamesFarming.MVVM.Models
         {
             Thread thread = new Thread(new ThreadStart(action));
             thread.Start();
+        }
+
+        public static void StartThreads(IEnumerable<Thread> threads)
+        {
+            new Thread( () =>
+            {
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                    thread.Join();
+                }
+
+            })
+            { ApartmentState = ApartmentState.STA}.Start();
         }
     }
 }
