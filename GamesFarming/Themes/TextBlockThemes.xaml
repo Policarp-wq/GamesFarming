@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Style TargetType="TextBlock" x:Key="Standart">
         <Setter Property="Background" Value="{DynamicResource Background}"/>
-        <Setter Property="Margin" Value="5"/>
+        <Setter Property="Margin" Value="10"/>
         <Setter Property="Padding" Value="4,2"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>

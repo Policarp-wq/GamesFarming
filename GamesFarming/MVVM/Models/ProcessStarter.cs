@@ -8,9 +8,8 @@ namespace GamesFarming.MVVM.Models
 {
     internal class ProcessStarter
     {
-        public const int MilliSecondsAwaitSteam = 10000;
-        private ProcessStartInfo _steamProcces;
-        private ProcessStartInfo _guardProcces;
+        private readonly ProcessStartInfo _steamProcces;
+        private readonly ProcessStartInfo _guardProcces;
         public string Path { get; private set; }
 
         public ProcessStarter(string filePath)
@@ -22,43 +21,47 @@ namespace GamesFarming.MVVM.Models
             _guardProcces.FileName = Steam.GuardPath;
         }
 
-
-
-        public void MultipleStart(IEnumerable<LaunchArgument> args)
+        public void MultipleStart(IEnumerable<LaunchArgument> args,CancellationToken cancellationToken, Action onStartEnd = null)
         {
             var UserResolution = Resolution.GetUserResolution();
-            int curX = 0;
-            int curY = 0;
-            int prevX = 0;
-            int prevY = 0;
             List<Thread> threads = new List<Thread>();
+            int posX = 0, posY = 0;
+            int prevX = 0;
+            int mxHeight = -1;
             foreach (var argument in args)
             {
-                if (curX + argument.Resolution.Width > UserResolution.Width)
+                if (posX + prevX + argument.Resolution.Width <= UserResolution.Width)
                 {
-                    curX = 0;
-                    curY += prevY;
-                }
-                else curX += prevX;
-                if (curY + argument.Resolution.Height > UserResolution.Height)
+                    posX += prevX;          
+                } 
+                else if(posY + mxHeight + argument.Resolution.Height <= UserResolution.Height)
                 {
-                    curX = 0;
-                    curY = 0;
+                    posX = 0;
+                    posY += mxHeight; 
                 }
-                var additionalArg = $" -x {curX} -y {curY}";
-                threads.Add(GetStartThread(argument, additionalArg));
-
+                else
+                {
+                    posX = 0;
+                    posY = 0;
+                    mxHeight = -1;
+                }
+                var additionalArg = $" -x {posX} -y {posY}";
+                threads.Add(GetLaunchThread(argument, additionalArg));
                 prevX = argument.Resolution.Width;
-                prevY = argument.Resolution.Height;
+                int prevY = argument.Resolution.Height;
+
+                mxHeight = Math.Max(mxHeight, prevY);
             }
-            ThreadHandler.StartThreads(threads);
+            ThreadHandler.StartThreads(threads, cancellationToken, () => onStartEnd?.Invoke());
         }
 
-        public Thread GetStartThread(LaunchArgument arg, string additional = "")
+        public Thread GetLaunchThread(LaunchArgument arg, string additional = "")
         {
-            var steamProcces = new ProcessStartInfo();
-            steamProcces.FileName = Path;
-            steamProcces.Arguments = arg.ToString() + additional;
+            var steamProcces = new ProcessStartInfo
+            {
+                FileName = Path,
+                Arguments = arg.ToString() + additional
+            };
             Thread thread = new Thread(() =>
             {
                 try
@@ -66,15 +69,14 @@ namespace GamesFarming.MVVM.Models
                     Process.Start(steamProcces);
                     Clipboard.SetText(arg.Account.Login);
                     //MessageBox.Show(arg.Account.Login);
-                    Thread.Sleep(MilliSecondsAwaitSteam);
+                    Thread.Sleep(Steam.MilliSecondsAwaitSteam);
                     Process.Start(_guardProcces);
-                    Thread.Sleep(3000);
+                    Thread.Sleep(Steam.MilliSecondsAfterLaucnh);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
-                Thread.Sleep(MilliSecondsAwaitSteam);
             });
             thread.SetApartmentState(ApartmentState.STA);
             return thread;

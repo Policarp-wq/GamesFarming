@@ -10,6 +10,7 @@ namespace GamesFarming.User
         {
             public string SteamPath = "";
             public string MAFilesPath = "";
+            public int LaunchSeconds = Steam.DefaultSteamLaunchSeconds; 
 
         }
         private static Settings _settings;
@@ -19,7 +20,7 @@ namespace GamesFarming.User
 
         public static string SettingsFolder;
         public static string SettingsPath => SettingsFolder + SettingsName;
-        public static string MAFilesPathHolder => SettingsFolder + MAFilesName;
+        private static string MAFilesPathHolder => SettingsFolder + MAFilesName;
         public static bool ContainsSteamPath => GetSteamPath().Length > 0;
         public static bool ContainsMAFilesPath => GetMAFilesPath().Length > 0;
 
@@ -35,6 +36,17 @@ namespace GamesFarming.User
             _settings.SteamPath = steamPath;
             Save();
         }
+
+        public static string GetSteamPath() => _settings.SteamPath;
+
+        public static void SetLaunchSeconds(int sec)
+        {
+            _settings.LaunchSeconds = sec;
+            Save();
+        }
+
+        public static int GetLaunchSeconds() => _settings.LaunchSeconds;
+
         public static void SetMAFilesPath(string maFilesFolderPath)
         {
             FileSafeAccess.WriteToFile(MAFilesPathHolder, maFilesFolderPath);
@@ -44,8 +56,6 @@ namespace GamesFarming.User
             return FileSafeAccess.ReadFile(MAFilesPathHolder);
         }
 
-        public static string GetSteamPath() => _settings.SteamPath;
-
         private static void Save()
         {
             string serializedSettings = JsonConvert.SerializeObject(_settings);
@@ -54,14 +64,14 @@ namespace GamesFarming.User
 
         private static Settings GetSettings()
         {
-            var serialized = Read();
+            var serialized = GetSerializedSettings();
             var settings = JsonConvert.DeserializeObject<Settings>(serialized);
             if (settings is null)
                 return new Settings();
             return settings;
         }
         
-        private static string Read()
+        private static string GetSerializedSettings()
         {
             var serialized = FileSafeAccess.ReadFile(SettingsPath);
             return serialized;

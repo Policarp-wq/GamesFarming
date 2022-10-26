@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace GamesFarming.MVVM.Models
 {
     public static class FileSafeAccess
     {
-        public static void CreateFile(string path, string text = "")
+        public static void CreateFile(string path)
         {
             var sw = File.CreateText(path);
             sw.Flush();

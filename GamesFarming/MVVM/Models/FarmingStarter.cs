@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace GamesFarming.MVVM.Models
@@ -10,40 +11,41 @@ namespace GamesFarming.MVVM.Models
     internal class FarmingStarter
     {
         private static int _seconds = 0;
-        private DispatcherTimer _launchTimer;
+        private ProcessStarter _starter;
+
+        public DispatcherTimer LaunchTimer { get; private set; }
 
         public event Action OnTimerStopped;
+        public Action OnTick { get; set; }
+        public IEnumerable<Account> LaunchAccounts { get; set; }
 
-        public FarmingStarter(Action onTimerStopped)
+        public FarmingStarter(string steamPath, IEnumerable<Account> accounts)
         {
-            OnTimerStopped += onTimerStopped;
-            _launchTimer = new DispatcherTimer();
-            _launchTimer.Interval = new TimeSpan(0, 0, 1);
-            _launchTimer.Tick += OnTick;
+            LaunchAccounts = accounts;
+            _starter = new ProcessStarter(steamPath);
+            LaunchTimer = new DispatcherTimer();
+            LaunchTimer.Interval = new TimeSpan(0, 0, 1);
+            LaunchTimer.Tick += Tick;
         }
-        public void StartFarming(string steamPath, IEnumerable<Account> accounts)
+        public void StartFarming(CancellationToken cancellationToken)
         {
-            ProcessStarter starter = new ProcessStarter(steamPath);
-
-            starter.MultipleStart(accounts.Select(x => new LaunchArgument(x)));
             _seconds = 0;
-            //
-            //_launchTimer.Start();
+            _starter.MultipleStart(LaunchAccounts.Select(x => new LaunchArgument(x)), cancellationToken, () => LaunchTimer.Start());
         }
 
         public void StopTimer()
         {
-            _launchTimer.Stop();
+            LaunchTimer.Stop();
             OnTimerStopped?.Invoke();
         }
 
-        private void OnTick(object sender, EventArgs e)
+        private void Tick(object sender, EventArgs e)
         {
+            OnTick?.Invoke();
             _seconds++;
             if(TimeSpan.FromSeconds(_seconds) == Steam.FarmingTime)
             {
-                _launchTimer.Stop();
-                OnTimerStopped?.Invoke();
+                StopTimer();
             }
 
         }

@@ -71,10 +71,10 @@ namespace GamesFarming.MVVM.Models
             var AccResolution = GetResolution(args);
             var AccGameCode = GetGameCode(args);
             var AccOptimization = LaunchArgument.DefaultOptimization;
-            Account account = new Account(AccLogin, AccPassword, AccGameCode, AccResolution, AccOptimization);
+            var Cfg = GetArg(args, Execution);
+            Account account = new Account(AccLogin, AccPassword, AccGameCode, AccResolution, Cfg, AccOptimization);
             if (!Validator.IsAccountValid(account))
                 throw new FileFormatException("Invalid bat to convert! Path : " + path + "Deserialized account : " + account.ToString());
-            account.Cfg = GetArg(args, Execution);
             account.Connect = GetConnect(args);
             return account;
         }

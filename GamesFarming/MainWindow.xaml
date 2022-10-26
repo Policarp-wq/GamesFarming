@@ -8,6 +8,7 @@
         xmlns:views="clr-namespace:GamesFarming.MVVM.Views"
         xmlns:viewmodels="clr-namespace:GamesFarming.MVVM.ViewModels"
         FontSize="22"
+        Background="{StaticResource Primary}"
         Title="MainWindow" Height="800" Width="1000">
     <Grid>
         <Grid.Resources>
@@ -52,6 +53,9 @@
                 <Button
                     Content="Import from .bat"
                     Command="{Binding Import}"/>
+                <Button
+                    Content="Settings"
+                    Command="{Binding OpenSettings}"/>
             </MenuItem>
         </Menu>
     </Grid>

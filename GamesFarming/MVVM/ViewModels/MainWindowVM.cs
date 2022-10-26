@@ -3,6 +3,7 @@ using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
 using GamesFarming.MVVM.Models;
 using GamesFarming.MVVM.Stores;
+using GamesFarming.MVVM.Views;
 using System;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -18,6 +19,7 @@ namespace GamesFarming.MVVM.ViewModels
         public ICommand MoveToRegistration { get; set; }
         public ICommand MoveToAccounts { get; set; }
         public ICommand Import { get; set; }
+        public ICommand OpenSettings { get; set; }
         public MainWindowVM(NavigationStore navigationStore)
         {
             
@@ -26,6 +28,7 @@ namespace GamesFarming.MVVM.ViewModels
             MoveToAccounts = new RelayCommand(() => _navigationStore.CurrentVM = new AccountsListVM());
             MoveToRegistration = new RelayCommand(() => _navigationStore.CurrentVM = new AccountRegistrationVM());
             Import = new RelayCommand(() => ImportFiles());
+            OpenSettings = new RelayCommand(() => OnOpenSettings());
         }
 
         private void OnCurrentVMChanged()
@@ -37,7 +40,13 @@ namespace GamesFarming.MVVM.ViewModels
         {
             FolderBrowserDialog folderBrowser = new FolderBrowserDialog();
             folderBrowser.ShowDialog();
-            ThreadHandler.StartInThread(() => DeserializeInDB(folderBrowser.SelectedPath));
+            DeserializeInDB(folderBrowser.SelectedPath);
+        }
+
+        public void OnOpenSettings()
+        {
+            SettingsView settings = new SettingsView() { DataContext = new SettingsVM() };
+            settings.Show();
         }
 
         private void DeserializeInDB(string folderPath)
@@ -60,5 +69,7 @@ namespace GamesFarming.MVVM.ViewModels
                 return true;
             return false;
         }
+
+        
     }
 }

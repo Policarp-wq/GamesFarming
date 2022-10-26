@@ -5,8 +5,9 @@ namespace GamesFarming.MVVM.Models
     internal class LaunchArgument
     {
         public const string DefaultOptimization = "-novid -nosound -low -nojoy -noshader -nofbo -nodcaudio -nomsaa +set vid level 0";
-        private string _connect => Account.Connect is null? "" : "+connect " + Account.Connect.ToString();
-        private string _cfg => Account.Cfg is null? "" : Account.Cfg;
+        private string Connect => Account.Connect is null? "" : "+connect " + Account.Connect.ToString();
+        private string Cfg => Account.Cfg is null? "" : Account.Cfg;
+        private string ResolutionParam => Account.Resolution is null || Account.IgnoreRes ? "" : $"-w {Resolution.Width} -h {Resolution.Height}";
 
         public static int DefaultCode = 730;
 
@@ -21,7 +22,8 @@ namespace GamesFarming.MVVM.Models
 
         public override string ToString()
         {
-            return $"-noreactlogin -silent -login {Account.Login} {Account.Password} -applaunch {Account.GameCode} -windowed -w {Resolution.Width} -h {Resolution.Height} +exec {_cfg} {_connect} {Account.Optimization}";
+            return
+                $"-noreactlogin -silent -login {Account.Login} {Account.Password} -applaunch {Account.GameCode} -windowed {ResolutionParam} +exec {Cfg} {Connect} {Account.Optimization}";
         }
 
     }

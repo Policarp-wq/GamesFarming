@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GamesFarming.MVVM.Models
 {
@@ -12,18 +13,25 @@ namespace GamesFarming.MVVM.Models
             thread.Start();
         }
 
-        public static void StartThreads(IEnumerable<Thread> threads)
+        public static void StartThreads(IEnumerable<Thread> threads, CancellationToken cancellationToken, Action onStartEnd = null)
         {
             new Thread( () =>
             {
-                foreach (var thread in threads)
+                new Task( () =>
                 {
-                    thread.Start();
-                    thread.Join();
-                }
+                    foreach (var thread in threads)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            break;
+                        thread.Start();
+                        thread.Join();
+                    }
+                }, cancellationToken).Start();
 
+                onStartEnd?.Invoke();
             })
             { ApartmentState = ApartmentState.STA}.Start();
+
         }
     }
 }

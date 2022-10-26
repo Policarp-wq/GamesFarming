@@ -32,9 +32,15 @@ namespace GamesFarming.DataBase
             var serializedAccounts = GetAcounts();
             serializedAccounts.AddRange(accounts.Where(a => !(a is null)));
 
-            string serializedUsers = JsonConvert.SerializeObject(accounts);
-            Write(serializedUsers);
+            string serializedUsers = JsonConvert.SerializeObject(serializedAccounts);
+           Write(serializedUsers);
 
+        }
+
+        public static void ReuploadDB(IEnumerable<Account> accounts)
+        {
+            ClearDB();
+            WriteToDB(accounts);
         }
 
         public static List<Account> GetAcounts()
@@ -44,6 +50,11 @@ namespace GamesFarming.DataBase
             if (accounts is null)
                 return Enumerable.Empty<Account>().ToList();
             return accounts;
+        }
+
+        public static void ClearDB()
+        {
+            Write("");
         }
 
         public static void DeleteFromDB(string login)

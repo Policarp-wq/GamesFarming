@@ -1,4 +1,5 @@
 ﻿using GamesFarming.DataBase;
+using System;
 
 namespace GamesFarming.MVVM.Models
 {
@@ -8,7 +9,9 @@ namespace GamesFarming.MVVM.Models
         public bool Selected { get; set; }
         public string Login => Account.Login;
         public int GameCode => Account.GameCode;
+        public string GameName => Decoder.GetName(GameCode);
         public string LastLaunchDate => Account.LastLaunchDate.ToShortDateString();
+        public bool NeedToLaunch => DateTime.Now - Account.LastLaunchDate >= Steam.LaunchSpan;
 
         public AccountPresentation(Account account)
         {
