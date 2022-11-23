@@ -1,12 +1,24 @@
 ﻿using GamesFarming.DataBase;
 using System;
+using System.ComponentModel;
 
 namespace GamesFarming.MVVM.Models
 {
     internal class AccountPresentation
     {
+        public event Action<Account, bool> SelectedChanged;
         public Account Account { get; set; }
-        public bool Selected { get; set; }
+        private bool _selected;
+
+        public bool Selected
+        {
+            get { return _selected; }
+            set 
+            {
+                _selected = value;
+                SelectedChanged?.Invoke(Account, value);
+            }
+        }
         public string Login => Account.Login;
         public int GameCode => Account.GameCode;
         public string GameName => Decoder.GetName(GameCode);

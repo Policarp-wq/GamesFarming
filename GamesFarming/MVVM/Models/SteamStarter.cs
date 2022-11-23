@@ -6,22 +6,32 @@ using System.Windows;
 
 namespace GamesFarming.MVVM.Models
 {
-    internal class ProcessStarter
+    internal class SteamStarter
     {
         private readonly ProcessStartInfo _steamProcces;
         private readonly ProcessStartInfo _guardProcces;
         public string Path { get; private set; }
 
-        public ProcessStarter(string filePath)
+        public SteamStarter(string filePath)
         {
             Path = filePath;
             _steamProcces = new ProcessStartInfo();
-            _guardProcces = new ProcessStartInfo();
             _steamProcces.FileName = Path;
+            _guardProcces = new ProcessStartInfo();
             _guardProcces.FileName = Steam.GuardPath;
         }
 
-        public void MultipleStart(IEnumerable<LaunchArgument> args,CancellationToken cancellationToken, Action onStartEnd = null)
+        public void StartByArgs(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onSteamLaunched, Action onStartEnd, Func<LaunchArgument, string> argToString = null)
+        {
+            List<Thread> threads = new List<Thread>();
+            foreach (var argument in args)
+            {
+                threads.Add(GetLaunchThread(argument, (arg) => arg.SteamLaunch, onSteamLaunched));
+            }
+            ThreadHandler.StartThreads(threads, cancellationToken, () => onStartEnd?.Invoke());
+        }
+
+        public void StartByArgsInOrder(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onSteamLaunched, Action onStartEnd, Func<LaunchArgument, string> argToString = null)
         {
             var UserResolution = Resolution.GetUserResolution();
             List<Thread> threads = new List<Thread>();
@@ -46,31 +56,31 @@ namespace GamesFarming.MVVM.Models
                     mxHeight = -1;
                 }
                 var additionalArg = $" -x {posX} -y {posY}";
-                threads.Add(GetLaunchThread(argument, additionalArg));
+                threads.Add(GetLaunchThread(argument, (arg) => arg.ToString(), onSteamLaunched, additionalArg));
                 prevX = argument.Resolution.Width;
                 int prevY = argument.Resolution.Height;
-
                 mxHeight = Math.Max(mxHeight, prevY);
             }
             ThreadHandler.StartThreads(threads, cancellationToken, () => onStartEnd?.Invoke());
         }
 
-        public Thread GetLaunchThread(LaunchArgument arg, string additional = "")
+        private Thread GetLaunchThread(LaunchArgument arg, Func<LaunchArgument, string> argToString, Action onSteamLaunched = null, string additional = "")
         {
             var steamProcces = new ProcessStartInfo
             {
                 FileName = Path,
-                Arguments = arg.ToString() + additional
+                Arguments = argToString(arg) + additional
             };
             Thread thread = new Thread(() =>
             {
                 try
                 {
                     Process.Start(steamProcces);
+                    Thread.Sleep(Steam.SteamLaunchMilliSeconds);
                     Clipboard.SetText(arg.Account.Login);
-                    //MessageBox.Show(arg.Account.Login);
-                    Thread.Sleep(Steam.MilliSecondsAwaitSteam);
                     Process.Start(_guardProcces);
+                    Thread.Sleep(Steam.MilliSecondsAfterLaucnh);
+                    onSteamLaunched?.Invoke();
                     Thread.Sleep(Steam.MilliSecondsAfterLaucnh);
                 }
                 catch (Exception ex)

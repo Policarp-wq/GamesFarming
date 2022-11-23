@@ -19,12 +19,16 @@ namespace GamesFarming.MVVM.Models
             {
                 new Task( () =>
                 {
+                    int cnt = 0;
                     foreach (var thread in threads)
                     {
+                        if (cnt % 5 == 0 && cnt != 0)
+                            Thread.Sleep(60000);
                         if (cancellationToken.IsCancellationRequested)
                             break;
                         thread.Start();
                         thread.Join();
+                        cnt++;
                     }
                 }, cancellationToken).Start();
 

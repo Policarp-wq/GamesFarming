@@ -2,6 +2,7 @@
 using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
 using GamesFarming.MVVM.Models;
+using GamesFarming.MVVM.Models.Accounts;
 using GamesFarming.User;
 using System;
 using System.Collections.Generic;
@@ -15,18 +16,12 @@ namespace GamesFarming.MVVM.ViewModels
 {
     internal class AccountsListVM : ViewModelBase
     {
-        private ObservableCollection<AccountPresentation> _accounts;
 
-        public ObservableCollection<AccountPresentation> Accounts
-        {
-            get { return _accounts; }
-            set 
-            {
-                _accounts = value;
-                OnPropertyChanged();
-            }
-        }
+        private CancellationTokenSource _cancellationTokenSource;
+        private readonly FarmingManager _manager;
+        public FilterableCollection<AccountPresentation> FilterableAccounts;
 
+        public ObservableCollection<AccountPresentation> Accounts => FilterableAccounts.GetFiltered();
         private AccountPresentation _selectedItem;
 
         public AccountPresentation SelectedItem
@@ -39,34 +34,70 @@ namespace GamesFarming.MVVM.ViewModels
             }
         }
 
-        private CancellationTokenSource _cancellationTokenSource;
+        private string _filterString;
+
+        public string FilterString
+        {
+            get { return _filterString; }
+            set 
+            {
+                _filterString = value;
+                OnPropertyChanged();
+                SetFilter();
+            }
+        }
+        public List<Account> SelectedAccounts;
+        public string SelectedAccountsCnt => SelectedAccounts.Count().ToString();
 
         public ICommand Start { get; set; }
         public ICommand Delete { get; set; }
         public ICommand GetInfo { get; set; }
         public ICommand Cancel { get; set; }
+        public ICommand ClearCloud { get; set; }
 
-        private readonly FarmingStarter _starter;
         public AccountsListVM()
         {
-            Accounts = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x))); // in thread
+            FilterableAccounts = new FilterableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x))); // in thread
+            SubscribeSelectionChanged(FilterableAccounts.Items);
+            FilterableAccounts.FilterChanged += () => OnPropertyChanged(nameof(Accounts));
+            SelectedAccounts = new List<Account>();
             Start = new RelayCommand(() => OnStart());
             Delete = new RelayCommand(() => DeleteAccounts());
             Cancel = new RelayCommand(() => OnCancel());
+            ClearCloud = new RelayCommand(() => OnClearCloud()); 
             GetInfo = new ParamCommand(p => OnGetInfo(p));
             _cancellationTokenSource = new CancellationTokenSource();
+             _manager = new FarmingManager(UserSettings.GetSteamPath());
+            Accounts.CollectionChanged += OnAccountsChanged;
         }
 
-        public IEnumerable<Account> SelectedAccounts => Accounts.Where(x => x.Selected)
-                                                                     .Select(x => x.Account);
+        private void OnAccountsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+             OnPropertyChanged(nameof(SelectedAccountsCnt));
+        }
 
+        public void SubscribeSelectionChanged(IEnumerable<AccountPresentation> accounts)
+        {
+            foreach (var el in accounts)
+            {
+                el.SelectedChanged += (acc, selected) =>
+                {
+                    if (selected)
+                        SelectedAccounts.Add(acc);
+                    else SelectedAccounts.Remove(acc);
+                    OnPropertyChanged(nameof(SelectedAccountsCnt));
+                };
+            }
+        }
+
+        
         public void OnStart()
         {
             try
             {
-                FarmingStarter starter = new FarmingStarter(UserSettings.GetSteamPath(), SelectedAccounts);
-                starter.StartFarming(_cancellationTokenSource.Token);
-                UpdateLaunchTime(SelectedAccounts);
+                _cancellationTokenSource = new CancellationTokenSource();
+                _manager.StartFarming(SelectedAccounts.Select(acc => new LaunchArgument(acc)), _cancellationTokenSource.Token);
+                UpdateLaunchTime();
                 Update();
             }
             catch (System.Exception ex)
@@ -78,12 +109,27 @@ namespace GamesFarming.MVVM.ViewModels
 
         public void OnCancel()
         {
-            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
         }
+        public void OnClearCloud()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            _manager.ClearCloudErrors(SelectedAccounts.Select(acc => new LaunchArgument(acc)), _cancellationTokenSource.Token);
+        }
+
+        public void SetFilter()
+        {
+            var general = Filters.GetGeneralFilter(FilterString);
+            if (general is null)
+                FilterableAccounts.ClearFilter();
+            else FilterableAccounts.SetFilter(x => general(x.Account));
+        }
+
 
         public void OnGetInfo(object p)
         {
-            var tuple = p as Tuple<object, object>;
+            Tuple<object, object> tuple = p as Tuple<object, object>;
             string output = "";
             if (tuple is null)
                 output = "Wrong convertation : " + p.ToString();
@@ -102,13 +148,13 @@ namespace GamesFarming.MVVM.ViewModels
 
         }
 
-        public void UpdateLaunchTime(IEnumerable<Account> changedAccounts)
+        public void UpdateLaunchTime()
         {
             List<Account> updatedAccs = new List<Account>();
-            foreach(var acc in Accounts.Select(x => x.Account))
+            foreach(var acc in FilterableAccounts.Items.Select(item => item.Account))
             {
                 Account newAccount = acc;
-                if (changedAccounts.Contains(acc))
+                if (SelectedAccounts.Contains(acc))
                 {
                     newAccount.LastLaunchDate = System.DateTime.Now;
                 }
@@ -121,13 +167,13 @@ namespace GamesFarming.MVVM.ViewModels
         public void DeleteAccounts()
         {
             JsonDB.DeleteFromDB(SelectedAccounts);
-            Accounts = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x)));
+            FilterableAccounts.Items = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x)));
             Update();
         }
 
         public void Update()
         {
-            Accounts = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x)));
+            FilterableAccounts.Items = new ObservableCollection<AccountPresentation>(JsonDB.GetAcounts().Select(x => new AccountPresentation(x)));
             OnPropertyChanged(nameof(Accounts));
             OnPropertyChanged(nameof(SelectedAccounts));
         }

@@ -58,7 +58,7 @@ namespace GamesFarming.MVVM.ViewModels
         public SettingsVM()
         {
             SteamPath = UserSettings.ContainsSteamPath ? UserSettings.GetSteamPath() : "Select steam.exe path";
-            MaFiles = UserSettings.ContainsMAFilesPath ? UserSettings.GetMAFilesPath() : "Select MA Files folder path path";
+            MaFiles = UserSettings.ContainsMAFilesPath ? UserSettings.GetMAFilesPath() : "Select MA Files folder path";
             SteamLaunch = UserSettings.GetLaunchSeconds().ToString();
             OnSteamExeSelector = new RelayCommand(() => ShowSteamExeSelector());
             OnMAFilesSelector = new RelayCommand(() => ShowMAFilesSelector());

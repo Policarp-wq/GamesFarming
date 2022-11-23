@@ -11,6 +11,8 @@ namespace GamesFarming.MVVM.Models
 
         public static int DefaultCode = 730;
 
+        public string SteamLaunch => $"-noreactlogin -login {Account.Login} {Account.Password}";
+
         public Account Account { get; set; }
         public Resolution Resolution { get; set; }
 

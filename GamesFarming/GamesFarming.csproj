@@ -217,6 +217,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsInput, Version=1.0.6.0, Culture=neutral, PublicKeyToken=de2685b4776e9c2e, processorArchitecture=MSIL">
+      <HintPath>..\packages\InputSimulatorPlus.1.0.7\lib\net20\WindowsInput.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -224,16 +227,21 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DataBase\JsonDB.cs" />
+    <Compile Include="GUI\Clicker.cs" />
+    <Compile Include="GUI\ClickInfo.cs" />
+    <Compile Include="GUI\ScreenCapture.cs" />
     <Compile Include="MVVM\Commands\ParamCommand.cs" />
     <Compile Include="MVVM\Converters\PresentationConverter.cs" />
     <Compile Include="MVVM\CustomUI\FieldWithName.xaml.cs">
       <DependentUpon>FieldWithName.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MVVM\Models\Accounts\Filters.cs" />
     <Compile Include="MVVM\Models\BatDeserializer.cs" />
     <Compile Include="MVVM\Models\ConfigReader.cs" />
     <Compile Include="MVVM\Models\Connection.cs" />
     <Compile Include="MVVM\Models\FileSafeAccess.cs" />
     <Compile Include="MVVM\Models\Decoder.cs" />
+    <Compile Include="MVVM\Models\FilterableCollection.cs" />
     <Compile Include="MVVM\Models\Validator.cs" />
     <Compile Include="MVVM\ViewModels\SettingsVM.cs" />
     <Compile Include="MVVM\Views\SettingsView.xaml.cs">
@@ -269,6 +277,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\ButtonThemes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\TextBlockThemes.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -283,9 +295,9 @@
     <Compile Include="MVVM\Base\ViewModelBase.cs" />
     <Compile Include="MVVM\Commands\RelayCommand.cs" />
     <Compile Include="MVVM\Models\AccountPresentation.cs" />
-    <Compile Include="MVVM\Models\FarmingStarter.cs" />
+    <Compile Include="MVVM\Models\FarmingManager.cs" />
     <Compile Include="MVVM\Models\LaunchArgument.cs" />
-    <Compile Include="MVVM\Models\ProcessStarter.cs" />
+    <Compile Include="MVVM\Models\SteamStarter.cs" />
     <Compile Include="MVVM\Models\Steam.cs" />
     <Compile Include="MVVM\Models\Resolution.cs" />
     <Compile Include="MVVM\Models\ThreadHandler.cs" />
@@ -342,7 +354,6 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
