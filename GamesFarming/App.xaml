@@ -7,10 +7,12 @@
         <ResourceDictionary >
             <SolidColorBrush x:Key="Background" Color="#CFCFCF"/>
             <SolidColorBrush x:Key="Primary" Color="#F8FEFF"/>
+            <BitmapImage x:Key="Icon" UriSource="/Resourses/Icons/icon.ico"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/TextBlockThemes.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxThemes.xaml"/>
                 <ResourceDictionary Source="Themes/ButtonThemes.xaml"/>
+                <ResourceDictionary Source="Themes/ImageThemes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

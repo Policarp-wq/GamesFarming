@@ -1,4 +1,5 @@
 ﻿using GamesFarming.MVVM.Models;
+using GamesFarming.User;
 using System;
 
 namespace GamesFarming.DataBase
@@ -13,7 +14,7 @@ namespace GamesFarming.DataBase
         public string Cfg { get; set; }
         public Connection Connect { get; set; }
         public bool IgnoreRes
-            => new ConfigReader(Steam.GetSteamFolderPath(), Cfg).ContainsParameter(Steam.ResolutionParameter);
+            => new ConfigReader(UserSettings.GetCfgPath(), Cfg).ContainsParameter(SteamLibrary.ResolutionParameter);
 
         public DateTime LastLaunchDate { get; set; }
         private Account() { }

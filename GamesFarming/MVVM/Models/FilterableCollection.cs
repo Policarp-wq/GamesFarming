@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GamesFarming.MVVM.Models
 {
@@ -19,8 +17,16 @@ namespace GamesFarming.MVVM.Models
         }
         public FilterableCollection() : this(Enumerable.Empty<T>()) { }
 
-        public ObservableCollection<T> GetFiltered()
-            => new ObservableCollection<T>(Items.Where(x => Filter is null ? true : Filter(x)));
+        public ObservableCollection<T> GetFiltered(IComparer<T> comparer = null)
+        {
+            var filtered = Items.Where(x => Filter is null ? true : Filter(x)).ToArray();
+            if(comparer == null)
+            {
+                return new ObservableCollection<T>(filtered);
+            }
+            Array.Sort(filtered, comparer);
+            return new ObservableCollection<T>(filtered);
+        }
 
         public void SetFilter(Func<T, bool> filter)
         {

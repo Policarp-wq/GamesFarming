@@ -15,6 +15,7 @@
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -23,9 +24,10 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid Margin="10"
-            Grid.ColumnSpan="4"
+            Grid.ColumnSpan="5"
             MinHeight="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -42,12 +44,26 @@
                        Text="{Binding SelectedAccountsCnt}"
                        MinWidth="30"/>
         </Grid>
-        <ListView Grid.Row="1"
-            Grid.ColumnSpan="4"
+        <ProgressBar Grid.Row="1"
+                     Margin="10"
+                     Height="10"
+                     Grid.ColumnSpan="3"
+                     Minimum="{Binding Minimum, Mode=OneWay}"
+                     Maximum="{Binding Maximum, Mode=OneWay}"
+                     Value="{Binding Value, Mode=OneWay}"
+                     />
+        <TextBlock Grid.Row="1"
+                     Style="{StaticResource Sign}"
+                     MinWidth="30"
+                     HorizontalAlignment="Left"
+                     Grid.Column="3"
+                     Text="{Binding Percents}"/>
+        <ListView Grid.Row="2"
+            Grid.ColumnSpan="5"
                   x:Name="ListView1"
             Margin="10" ItemsSource="{Binding Accounts}"
                   SelectionMode="Extended"
-                  SelectedItem="{Binding SelectedItem}"
+                  
                   Background="{StaticResource Primary}"
                   >
             <ListView.ItemTemplate>
@@ -86,7 +102,7 @@
                                 MaxHeight="30"
                                 Command="{Binding ElementName=ListView1, Path=DataContext.GetInfo}"
                                 Content="?">
-                            
+
                             <Button.CommandParameter>
                                 <MultiBinding Converter="{StaticResource presentationConverter}">
                                     <Binding Path="Login"/>
@@ -97,17 +113,6 @@
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
-            <!--<ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Login" 
-                                    DisplayMemberBinding="{Binding Login}"/>
-                    <GridViewColumn Header="Game code"
-                                    DisplayMemberBinding="{Binding GameCode}"/>
-                    <GridViewColumn Header="Last launch"
-                                    DisplayMemberBinding="{Binding LastLaunchDate}"
-                                    CellTemplate=""/>
-                </GridView>
-            </ListView.View>-->
             <ListView.Resources>
                 <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="IsSelected" Value="{Binding Selected, Mode=TwoWay}"/>
@@ -115,29 +120,35 @@
                 
             </ListView.Resources>
         </ListView>
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Grid.Column="0"
                 Margin="10"
             Content="Start" MaxWidth="150"
                 Background="LightGreen"
                 Command="{Binding Start}"/>
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Grid.Column="1"
                 Margin="10"
             Content="Cancel launch" MaxWidth="220"
                 Background="LightSkyBlue"
                 Command="{Binding Cancel}"/>
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Grid.Column="2"
                 Margin="10"
-            Content="Delete" MaxWidth="150"
+            Content="Remove" MaxWidth="150"
                 Background="IndianRed"
                 Command="{Binding Delete}"/>
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Grid.Column="3"
                 Margin="10"
             Content="Clear cloud" MaxWidth="150"
                 Background="LightGoldenrodYellow"
                 Command="{Binding ClearCloud}"/>
+        <Button Grid.Row="3"
+                Grid.Column="4"
+                Margin="10"
+            Content="Select all" MaxWidth="150"
+                Background="MediumSeaGreen"
+                Command="{Binding SelectAll}"/>
     </Grid>
 </UserControl>

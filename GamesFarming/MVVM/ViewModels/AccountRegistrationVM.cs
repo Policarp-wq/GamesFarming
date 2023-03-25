@@ -98,8 +98,10 @@ namespace GamesFarming.MVVM.ViewModels
 
 
         public ICommand Register { get; set; }
+        public readonly DBAccess<Account> AccountsDB;
         public AccountRegistrationVM()
         {
+            AccountsDB = new DBAccess<Account>(DBKeys.AccountKey);
             Register = new RelayCommand(() => ThreadHandler.StartInThread(RegisterAccount));
         }
 
@@ -109,10 +111,9 @@ namespace GamesFarming.MVVM.ViewModels
             {
                 Account account = new Account(Login, Password, int.Parse(GameCode), int.Parse(ResX), int.Parse(ResY), ConfigName, Optimize ? LaunchArgument.DefaultOptimization: "");
                 //account.Cfg = ConfigName;
-                JsonDB.WriteToDB(account);
+                AccountsDB.WriteToDB(account);
                 Login = "";
                 Password = "";
-                MessageBox.Show("Succesful!");
             }
             catch (Exception ex)
             {

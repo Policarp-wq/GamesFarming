@@ -8,8 +8,10 @@
         xmlns:views="clr-namespace:GamesFarming.MVVM.Views"
         xmlns:viewmodels="clr-namespace:GamesFarming.MVVM.ViewModels"
         FontSize="22"
+        Icon="{StaticResource Icon}"
         Background="{StaticResource Primary}"
-        Title="MainWindow" Height="800" Width="1000">
+        WindowStartupLocation="CenterScreen"
+        Title="Farming panel (by Policarp)" Height="800" Width="1000">
     <Grid>
         <Grid.Resources>
             <DataTemplate DataType="{x:Type viewmodels:AccountRegistrationVM}">
@@ -19,7 +21,10 @@
             <DataTemplate DataType="{x:Type viewmodels:AccountsListVM}">
                 <views:AccountsListView/>
             </DataTemplate>
-
+            
+            <DataTemplate DataType="{x:Type viewmodels:ServersListVM}">
+                <views:ServersListView/>
+            </DataTemplate>
         </Grid.Resources>
 
         <Grid.ColumnDefinitions>
@@ -30,33 +35,47 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition/>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="auto"
+                           MinHeight="20"/>
         </Grid.RowDefinitions>
-        
-        <StackPanel Grid.Row="1"
-                    Grid.Column="0"
-            Orientation="Vertical">
-            <Button Margin="15"
-                Content="To registration"
-                    Command="{Binding MoveToRegistration}"/>
-            <Button Margin="15"
-                Content="To accounts"
-                    Command="{Binding MoveToAccounts}"/>
-        </StackPanel>
-        
-        <ContentControl Grid.Column="1" Grid.Row="1"
-                 Content="{Binding CurrentVM}"/>
-        <Menu MaxWidth="100"
+
+        <Menu Width="120"
+              Height="30"
+              FontSize="22"
               HorizontalAlignment="Left"
-              Margin="0,0,5,5">
-            <MenuItem Header="Menu">
-                <Button
-                    Content="Import from .bat"
-                    Command="{Binding Import}"/>
-                <Button
-                    Content="Settings"
-                    Command="{Binding OpenSettings}"/>
+              Margin="0,0,10,10">
+            <MenuItem Header="Menu" >
+                <MenuItem Header="Import from .bat"
+                          Command="{Binding Import}"/>
+                <MenuItem Header="Settings"
+                          Command="{Binding OpenSettings}"/>
             </MenuItem>
         </Menu>
+        <Grid Grid.Row="1"
+              Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical">
+                    <Button Margin="15"
+                    Content="Accounts"
+                        Command="{Binding MoveToAccounts}"/>
+                    <Button Margin="15"
+                    Content="Servers"
+                        Command="{Binding MoveToServers}"/>
+                <Button Margin="15"
+                    Content="Register"
+                        Command="{Binding MoveToRegistration}"/>
+            </StackPanel>
+            <Button Grid.Column="0"
+                Grid.Row="1"
+            Style="{StaticResource StandartButton}">
+                <Image Source="{StaticResource Icon}"/>
+            </Button>
+        </Grid>
+
+        <ContentControl Grid.Column="1" Grid.Row="1"
+                 Content="{Binding CurrentVM}"/>
     </Grid>
 </Window>

@@ -4,11 +4,12 @@ namespace GamesFarming.MVVM.Models
 {
     public static class Decoder
     {
-
+        public const int CSCode = 730;
+        public const int TFCode = 440;
         private static Dictionary<int, string> _gamesNames = new Dictionary<int, string>()
         {
-            { 440, "TF2"},
-            { 730, "CS:GO"},
+            { TFCode, "TF2"},
+            { CSCode, "CS:GO"},
         };
 
         public static string GetName(int code)

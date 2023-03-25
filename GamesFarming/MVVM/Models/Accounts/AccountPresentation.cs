@@ -1,4 +1,5 @@
 ﻿using GamesFarming.DataBase;
+using GamesFarming.MVVM.Models.Steam;
 using System;
 using System.ComponentModel;
 
@@ -15,6 +16,8 @@ namespace GamesFarming.MVVM.Models
             get { return _selected; }
             set 
             {
+                if (_selected == value)
+                    return;
                 _selected = value;
                 SelectedChanged?.Invoke(Account, value);
             }
@@ -22,8 +25,8 @@ namespace GamesFarming.MVVM.Models
         public string Login => Account.Login;
         public int GameCode => Account.GameCode;
         public string GameName => Decoder.GetName(GameCode);
-        public string LastLaunchDate => Account.LastLaunchDate.ToShortDateString();
-        public bool NeedToLaunch => DateTime.Now - Account.LastLaunchDate >= Steam.LaunchSpan;
+        public string LastLaunchDate => Account.LastLaunchDate.ToString();
+        public bool NeedToLaunch => LaunchTimeManager.NeedToLaunch(Account.LastLaunchDate, GameCode);
 
         public AccountPresentation(Account account)
         {

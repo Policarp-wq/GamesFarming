@@ -18,14 +18,17 @@ namespace GamesFarming.MVVM.ViewModels
 
         public ICommand MoveToRegistration { get; set; }
         public ICommand MoveToAccounts { get; set; }
+        public ICommand MoveToServers { get; set; }
         public ICommand Import { get; set; }
         public ICommand OpenSettings { get; set; }
+        public readonly DBAccess<Account> AccountsDB;
         public MainWindowVM(NavigationStore navigationStore)
         {
-            
+            AccountsDB = new DBAccess<Account>(DBKeys.AccountKey);
             _navigationStore = navigationStore;
             _navigationStore.CurrentVMChanged += OnCurrentVMChanged;
             MoveToAccounts = new RelayCommand(() => _navigationStore.CurrentVM = new AccountsListVM());
+            MoveToServers = new RelayCommand(() => _navigationStore.CurrentVM = new ServersListVM());
             MoveToRegistration = new RelayCommand(() => _navigationStore.CurrentVM = new AccountRegistrationVM());
             Import = new RelayCommand(() => ImportFiles());
             OpenSettings = new RelayCommand(() => OnOpenSettings());
@@ -54,7 +57,7 @@ namespace GamesFarming.MVVM.ViewModels
             try
             {
                 var deserialized = BatDeserializer.DeserializeFolderFiles(folderPath, OnExceptionCaused);
-                JsonDB.WriteToDB(deserialized);
+                AccountsDB.WriteToDB(deserialized);
             }
             catch(Exception ex)
             {

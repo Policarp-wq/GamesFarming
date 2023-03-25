@@ -18,8 +18,10 @@ namespace GamesFarming
         {
             try
             {
-                NavigationStore navigationStore = new NavigationStore();
-                navigationStore.CurrentVM = new AccountRegistrationVM();
+                NavigationStore navigationStore = new NavigationStore
+                {
+                    CurrentVM = new AccountsListVM()
+                };
                 MainWindow = new MainWindow() { DataContext = new MainWindowVM(navigationStore) };
                 MainWindow.Show();
                 if (!(UserSettings.ContainsSteamPath && UserSettings.ContainsMAFilesPath))

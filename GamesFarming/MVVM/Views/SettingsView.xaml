@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GamesFarming.MVVM.Views"
         mc:Ignorable="d"
-        Title="SettingsView" Height="450" Width="800" Background="{StaticResource Primary}"
+        Title="SettingsView" Height="650" Width="800" Background="{StaticResource Primary}"
              FontSize="22">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -21,6 +21,10 @@
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="60"/>
                 <RowDefinition Height="60"/>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="60"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
                        MinHeight="30"
@@ -29,6 +33,11 @@
                        Margin="10"
                        Background="#C0C0CF"
                        />
+            <Button Grid.Column="1" Grid.Row="0"
+                    Margin="10"
+                    Content="..."
+                    Height="30"
+                    Command="{Binding OnSteamExeSelector}"/>
             <TextBlock Grid.Row="1"
                        MinHeight="30"
                        Margin="10"
@@ -36,17 +45,24 @@
                        FontStyle="Italic"
                        Background="#C0C0CF"
                        />
-            <Button Grid.Column="1" Grid.Row="0"
-                    Margin="10"
-                    Content="..."
-                    Height="30"
-                    Command="{Binding OnSteamExeSelector}"/>
             <Button Grid.Column="1" Grid.Row="1"
                     Margin="10"
                     Height="30"
                     Content="..."
                     Command="{Binding OnMAFilesSelector}"/>
-            <Grid Grid.Column="0" Grid.Row="2"
+            <TextBlock Grid.Row="2"
+                       MinHeight="30"
+                       Margin="10"
+                       Text="{Binding Cfg}"
+                       FontStyle="Italic"
+                       Background="#C0C0CF"
+                       />
+            <Button Grid.Column="1" Grid.Row="2"
+                    Margin="10"
+                    Height="30"
+                    Content="..."
+                    Command="{Binding OnCfgSelector}"/>
+            <Grid Grid.Column="0" Grid.Row="3"
                   Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -56,6 +72,40 @@
                            Text="Steam launch time"/>
                 <TextBox Grid.Column="1"
                          Text="{Binding SteamLaunch}"
+                         MinWidth="30"
+                         Margin="5"
+                         Background="#CFC5CF"/>
+            </Grid>
+            <StackPanel Grid.Column="0" Grid.Row="4"
+                        Orientation="Horizontal"
+                  Margin="10">
+                <TextBlock
+                           Text="Farm time   "/>
+                <TextBlock
+                           Text="Hours:  "/>
+                <TextBox Grid.Column="1"
+                         Text="{Binding FarmTimeHrs}"
+                         MinWidth="30"
+                         Margin="5"
+                         Background="#CFC5CF"/>
+                <TextBlock
+                           Text="Minutes:  "/>
+                <TextBox Grid.Column="2"
+                         Text="{Binding FarmTimeMins}"
+                         MinWidth="30"
+                         Margin="5"
+                         Background="#CFC5CF"/>
+            </StackPanel>
+            <Grid Grid.Column="0" Grid.Row="5"
+                  Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                           Text="Accounts in group"/>
+                <TextBox Grid.Column="1"
+                         Text="{Binding AccsInGroup}"
                          MinWidth="30"
                          Margin="5"
                          Background="#CFC5CF"/>
