@@ -140,7 +140,6 @@ namespace GamesFarming.MVVM.Models
                         return;
                     Clicker.ExecuteClicks(GUIScenario.GetLeave);
                     Thread.Sleep(SteamLibrary.SteamQuitWindowAwaitMilliSeconds);
-                    Clicker.ExecuteClicks(GUIScenario.GetSteamQuit);
                     TaskManager.CloseProcces("steam");
                     Thread.Sleep(7000);
                 }), null, (arg) => arg.SteamLaunch);

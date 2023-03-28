@@ -30,9 +30,5 @@ namespace GamesFarming.GUI
             new ClickInfo(new Point(1663, 95), WaitTime), //leave
             new ClickInfo(new Point(925, 567), WaitTime) //confirm
         };
-        private static List<ClickInfo> SteamQuit = new List<ClickInfo>()
-        {
-            new ClickInfo(new Point(1183, 369), WaitTime)//quit
-        };
     }
 }

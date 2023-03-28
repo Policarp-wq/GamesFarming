@@ -13,6 +13,7 @@ namespace GamesFarming.MVVM.ViewModels
     internal class MainWindowVM: ViewModelBase
     {
         private NavigationStore _navigationStore;
+        public const string HelpMessage = "If you have any questions or you have found a bug, contact me tg:@Policarp228";
 
         public ViewModelBase CurrentVM => _navigationStore.CurrentVM;
 
@@ -21,17 +22,22 @@ namespace GamesFarming.MVVM.ViewModels
         public ICommand MoveToServers { get; set; }
         public ICommand Import { get; set; }
         public ICommand OpenSettings { get; set; }
+        public ICommand GetHelp { get; set; }
+        public ICommand Close { get; set; }
         public readonly DBAccess<Account> AccountsDB;
         public MainWindowVM(NavigationStore navigationStore)
         {
             AccountsDB = new DBAccess<Account>(DBKeys.AccountKey);
             _navigationStore = navigationStore;
             _navigationStore.CurrentVMChanged += OnCurrentVMChanged;
-            MoveToAccounts = new RelayCommand(() => _navigationStore.CurrentVM = new AccountsListVM());
+
+            Close = new RelayCommand(() => _navigationStore.MainWindow.Hide());
+            MoveToAccounts = new RelayCommand(() => _navigationStore.CurrentVM = new AccountsListVM(navigationStore));
             MoveToServers = new RelayCommand(() => _navigationStore.CurrentVM = new ServersListVM());
             MoveToRegistration = new RelayCommand(() => _navigationStore.CurrentVM = new AccountRegistrationVM());
             Import = new RelayCommand(() => ImportFiles());
             OpenSettings = new RelayCommand(() => OnOpenSettings());
+            GetHelp = new RelayCommand(() => MessageBox.Show(HelpMessage, "Info", MessageBoxButtons.OK));
         }
 
         private void OnCurrentVMChanged()

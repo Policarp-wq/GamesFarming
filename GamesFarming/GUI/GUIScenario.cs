@@ -14,12 +14,10 @@ namespace GamesFarming.GUI
         public const string ToCloud = "ToCloud.txt";
         public const string Leave = "Leave.txt";
         public const string Tick = "Tick.txt";
-        public const string SteamQuit = "SteamQuit.txt";
 
         public static IEnumerable<ClickInfo> GetToCloud => GetCommands(GlobalPath + ToCloud);
         public static IEnumerable<ClickInfo> GetLeave => GetCommands(GlobalPath + Leave);
         public static IEnumerable<ClickInfo> GetTick => GetCommands(GlobalPath + Tick);
-        public static IEnumerable<ClickInfo> GetSteamQuit => GetCommands(GlobalPath + SteamQuit);
 
 
         private static IEnumerable<ClickInfo> GetCommands(string path)
