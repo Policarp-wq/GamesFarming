@@ -8,6 +8,11 @@
             <SolidColorBrush x:Key="Background" Color="#CFCFCF"/>
             <SolidColorBrush x:Key="Primary" Color="#F8FEFF"/>
             <BitmapImage x:Key="Icon" UriSource="/Resourses/Icons/icon.ico"/>
+            <BitmapImage x:Key="Icon2" UriSource="/Resourses/Icons/icon2.ico"/>
+            <BitmapImage x:Key="Icon3" UriSource="/Resourses/Icons/icon3.png"/>
+            <BitmapImage x:Key="Cross" UriSource="/Resourses/Icons/cross.png"/>
+            <BitmapImage x:Key="Question" UriSource="/Resourses/Icons/questionmark.png"/>
+            <BitmapImage x:Key="Help" UriSource="/Resourses/Icons/help.png"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/TextBlockThemes.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxThemes.xaml"/>

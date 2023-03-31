@@ -20,7 +20,7 @@ namespace GamesFarming.DataBase
         private Account() { }
         public Account(string login, string password, int gameCode, int width, int height, string cfg = null, string optimize = LaunchArgument.DefaultOptimization)
         {
-            Login = login;
+            Login = login.ToLower();
             Password = password;
             GameCode = gameCode;
             Optimization = optimize;

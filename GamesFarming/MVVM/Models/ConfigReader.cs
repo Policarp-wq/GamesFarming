@@ -22,5 +22,13 @@
         {
             return ConfigParams.Contains(param);
         }
+        public string GetLineWithParameter(string param) 
+        {
+            foreach(var line in ConfigParams)
+            {
+                
+            }
+            return "";
+        }
     }
 }

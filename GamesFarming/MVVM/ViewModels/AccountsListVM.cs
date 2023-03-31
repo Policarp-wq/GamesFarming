@@ -5,6 +5,7 @@ using GamesFarming.MVVM.Models;
 using GamesFarming.MVVM.Models.Accounts;
 using GamesFarming.MVVM.Models.PC;
 using GamesFarming.MVVM.Models.Steam;
+using GamesFarming.MVVM.Stores;
 using GamesFarming.User;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace GamesFarming.MVVM.ViewModels
 
         public ObservableCollection<AccountPresentation> Accounts => FilterableAccounts.GetFiltered(new AccountPresentationComparer());
         private AccountPresentation _selectedItem;
+        public NavigationStore NavigationStore;
 
         private string _filterString;
         public string FilterString
@@ -57,8 +59,9 @@ namespace GamesFarming.MVVM.ViewModels
         public readonly DBAccess<Account> AccountsDB;
         
 
-        public AccountsListVM()
+        public AccountsListVM(NavigationStore navigationStore)
         {
+            NavigationStore = navigationStore;
             AccountsDB = new DBAccess<Account>(DBKeys.AccountKey);
             FilterableAccounts = new FilterableCollection<AccountPresentation>(AccountsDB.GetItems().Select(x => new AccountPresentation(x))); // in thread
             SubscribeSelectionChanged(FilterableAccounts.Items);
@@ -66,6 +69,8 @@ namespace GamesFarming.MVVM.ViewModels
             SelectedAccounts = new List<Account>();
             FarmingProgress = new FarmProgress();
             FarmingProgress.Updated += OnFarmingProgressUpdated;
+             _manager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress);
+
             Start = new RelayCommand(() => OnStart());
             Delete = new RelayCommand(() => DeleteAccounts());
             Cancel = new RelayCommand(() => OnCancel());
@@ -73,7 +78,6 @@ namespace GamesFarming.MVVM.ViewModels
             GetInfo = new ParamCommand(p => OnGetInfo(p));
             SelectAll = new RelayCommand(() => OnSelectAll());
             _cancellationTokenSource = new CancellationTokenSource();
-             _manager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress);
             Accounts.CollectionChanged += OnAccountsChanged;
         }
 
@@ -122,13 +126,15 @@ namespace GamesFarming.MVVM.ViewModels
             try
             {
                 _cancellationTokenSource = new CancellationTokenSource();
-                var selectedArgs = SelectedAccounts.Select(acc => new LaunchArgument(acc));
-
-                    _manager.StartFarming(selectedArgs, _cancellationTokenSource.Token, () =>
-                    {
-                        UpdateLaunchTime(selectedArgs.Select(x => x.Account));
-                        Update();
-                    });
+                var selectedArgs = new List<LaunchArgument>(SelectedAccounts.Select(acc => new LaunchArgument(acc)));
+                NavigationStore.TrayIcon.ShowBalloonTip(2000, "Start", $"Farming has started with {selectedArgs.Count} accounts",
+                    System.Windows.Forms.ToolTipIcon.Info);
+               _manager.StartFarming(selectedArgs, _cancellationTokenSource.Token, () =>
+               {
+                   UpdateLaunchTime(selectedArgs.Select(x => x.Account));
+                   Update();
+                   NavigationStore.TrayIcon.ShowBalloonTip(3000, "Success", "Selected accounts has been farmed", System.Windows.Forms.ToolTipIcon.Info);
+               });
 
                 
             }
