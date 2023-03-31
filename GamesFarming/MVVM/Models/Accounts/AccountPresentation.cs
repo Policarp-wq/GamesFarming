@@ -1,7 +1,6 @@
 ﻿using GamesFarming.DataBase;
 using GamesFarming.MVVM.Models.Steam;
 using System;
-using System.ComponentModel;
 
 namespace GamesFarming.MVVM.Models
 {

@@ -1,5 +1,4 @@
 ﻿using GamesFarming.MVVM.Models;
-using GamesFarming.User;
 using System;
 
 namespace GamesFarming.DataBase

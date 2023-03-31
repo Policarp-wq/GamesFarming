@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace GamesFarming.MVVM.Models.PC
@@ -19,6 +20,10 @@ namespace GamesFarming.MVVM.Models.PC
                     throw new Exception($"{ex.Message} while closing proccesses by name {name}");
                 }
             }
+        }
+        public static IEnumerable<Process> GetProcesses(string name)
+        {
+            return Process.GetProcessesByName(name);
         }
     }
 }

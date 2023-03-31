@@ -234,9 +234,6 @@
     <Compile Include="GUI\ScreenCapture.cs" />
     <Compile Include="MVVM\Commands\ParamCommand.cs" />
     <Compile Include="MVVM\Converters\PresentationConverter.cs" />
-    <Compile Include="MVVM\CustomUI\FieldWithName.xaml.cs">
-      <DependentUpon>FieldWithName.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MVVM\Models\Accounts\AccountPresentationComparer.cs" />
     <Compile Include="MVVM\Models\Accounts\Filters.cs" />
     <Compile Include="MVVM\Models\BatDeserializer.cs" />
@@ -284,10 +281,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MVVM\CustomUI\FieldWithName.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MVVM\Views\AccountRegistrationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

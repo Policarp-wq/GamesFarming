@@ -1,9 +1,11 @@
-﻿using GamesFarming.MVVM.Stores;
+﻿using GamesFarming.MVVM.Models.PC;
+using GamesFarming.MVVM.Stores;
 using GamesFarming.MVVM.ViewModels;
 using GamesFarming.MVVM.Views;
 using GamesFarming.User;
 using System;
-using System.Threading;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using Froms = System.Windows.Forms;
 
@@ -16,11 +18,13 @@ namespace GamesFarming
         public static string UserFileName = "UserData.txt";
         public static string IconPath = "Resourses/Icons/icon3.ico";
         public static string UserDataDirectory = @".";
+
         private MainWindow _mainWindow;
         private NavigationStore _navigationStore;
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            CheckIsAlreadyRunning();
             try
             {
                 _trayIcon = GetIcon();
@@ -46,6 +50,22 @@ namespace GamesFarming
             }
         }
 
+        private void CheckIsAlreadyRunning()
+        {
+            var appName = Process.GetCurrentProcess().ProcessName;
+            if(TaskManager.GetProcesses(appName).Count() > 1)
+            {
+                var res = MessageBox.Show("You have already started farming panel! Want to kill all processes?",
+                    "Warning!", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if(res == MessageBoxResult.Yes)
+                {
+                    TaskManager.CloseProcces(appName);
+                }
+                else Current.Shutdown();
+            }
+                
+        }
+
         private Froms.NotifyIcon GetIcon()
         {
             var icon = new Froms.NotifyIcon
@@ -56,7 +76,7 @@ namespace GamesFarming
             };
             icon.DoubleClick += OnTreyIconDoubleClicked;
             icon.ContextMenu = new Froms.ContextMenu();
-            icon.ContextMenu.MenuItems.Add(new System.Windows.Forms.MenuItem("Exit", (e, a) => Shutdown()));
+            icon.ContextMenu.MenuItems.Add(new System.Windows.Forms.MenuItem("Exit", (e, a) => Current.Shutdown()));
             return icon;
         }
         protected override void OnExit(ExitEventArgs e)

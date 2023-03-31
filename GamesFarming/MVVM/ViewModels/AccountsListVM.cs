@@ -3,7 +3,6 @@ using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
 using GamesFarming.MVVM.Models;
 using GamesFarming.MVVM.Models.Accounts;
-using GamesFarming.MVVM.Models.PC;
 using GamesFarming.MVVM.Models.Steam;
 using GamesFarming.MVVM.Stores;
 using GamesFarming.User;
@@ -12,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -25,7 +25,7 @@ namespace GamesFarming.MVVM.ViewModels
         public FilterableCollection<AccountPresentation> FilterableAccounts;
 
         public ObservableCollection<AccountPresentation> Accounts => FilterableAccounts.GetFiltered(new AccountPresentationComparer());
-        private AccountPresentation _selectedItem;
+
         public NavigationStore NavigationStore;
 
         private string _filterString;
@@ -79,6 +79,8 @@ namespace GamesFarming.MVVM.ViewModels
             SelectAll = new RelayCommand(() => OnSelectAll());
             _cancellationTokenSource = new CancellationTokenSource();
             Accounts.CollectionChanged += OnAccountsChanged;
+
+            StartFarmReadyCheck();
         }
 
         private void OnFarmingProgressUpdated()
@@ -108,6 +110,32 @@ namespace GamesFarming.MVVM.ViewModels
             }
         }
 
+        public async void StartFarmReadyCheck()
+        {
+            const int hoursTick = 1;
+            await Task.Run(() =>
+            {
+                while (true)
+                {
+                    Check();
+                    Thread.Sleep(hoursTick * 3600 * 1000);
+                }
+            });
+        }
+
+        public void Check()
+        {
+            int cnt = 0;
+            foreach(var acc in Accounts)
+            {
+                if (acc.NeedToLaunch)
+                    ++cnt;
+            }
+            if (cnt > 0)
+                NavigationStore.TrayIcon.ShowBalloonTip(3000, "Attention!", $"You have {cnt} accounts to farm!",
+                    System.Windows.Forms.ToolTipIcon.Info);
+        }
+
         public void OnSelectAll()
         {
             int selectdID = -1;
@@ -120,7 +148,6 @@ namespace GamesFarming.MVVM.ViewModels
             }
         }
 
-        
         public void OnStart()
         {
             try
@@ -152,6 +179,8 @@ namespace GamesFarming.MVVM.ViewModels
                 _cancellationTokenSource?.Cancel();
                 _cancellationTokenSource?.Dispose();
                 _manager.CloseFarmApps();
+                SelectedAccounts.Clear();
+                Update();
             }
             catch(ObjectDisposedException)
             {
@@ -177,10 +206,9 @@ namespace GamesFarming.MVVM.ViewModels
             else FilterableAccounts.SetFilter(x => general(x.Account));
         }
 
-
         public void OnGetInfo(object p)
         {
-            var tuple = p as Tuple<object, object>;
+            Tuple<object, object> tuple = p as Tuple<object, object>;
             string output = "";
             if (tuple is null)
                 output = "Wrong convertation : " + p.ToString();

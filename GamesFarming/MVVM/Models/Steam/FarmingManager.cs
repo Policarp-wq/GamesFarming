@@ -40,7 +40,7 @@ namespace GamesFarming.MVVM.Models
             };
             LaunchTimer.TimerStopped += () => 
             {
-                CloseFarmApps(); FarmingProgress.Up(); store.MainWindow.Dispatcher.Invoke( () => _timerView.Close());
+                CloseFarmApps(); FarmingProgress.Up(); store.MainWindow.Dispatcher.Invoke( () => _timerView.Hide());
             };
         }
         public void StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)

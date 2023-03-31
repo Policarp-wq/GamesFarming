@@ -1,5 +1,4 @@
-﻿using FastSerialization;
-using GamesFarming.DataBase;
+﻿using GamesFarming.DataBase;
 using GamesFarming.User;
 
 namespace GamesFarming.MVVM.Models
