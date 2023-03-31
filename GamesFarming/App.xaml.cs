@@ -67,9 +67,9 @@ namespace GamesFarming
 
         private void OnTreyIconDoubleClicked(object sender, EventArgs e)
         {
-            MainWindow.Show();
-            MainWindow.WindowState = WindowState.Normal;
-            MainWindow.Activate();
+            _mainWindow.Show();
+            _mainWindow.WindowState = WindowState.Normal;
+            _mainWindow.Activate();
         }
     }
 }

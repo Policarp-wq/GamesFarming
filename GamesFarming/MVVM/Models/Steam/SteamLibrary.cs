@@ -22,7 +22,7 @@ namespace GamesFarming.MVVM.Models
 
         public const string GuardName = "guard.exe";
         public const string CleanerName = "cloudCleaner.exe";
-        public const string ResolutionParameter = "mat_setvideomode";
+        
         public static string GuardPath => Environment.CurrentDirectory + "\\" + GuardName;
         public static string CleanerPath => Environment.CurrentDirectory + "\\" + CleanerName;
         public static Color TickColor = Color.FromArgb(0, 241, 241, 241);

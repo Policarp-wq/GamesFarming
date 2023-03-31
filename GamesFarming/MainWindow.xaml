@@ -43,7 +43,8 @@
                 <RowDefinition Height="auto"
                                MinHeight="20"/>
             </Grid.RowDefinitions>
-            <Border Grid.ColumnSpan="3">
+            <Border Grid.ColumnSpan="3"
+                    Background="#e6e6ff">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
@@ -87,8 +88,7 @@
                 </Grid>
             </Border>
             <Border Grid.Row="1"
-                    Grid.Column="0"
-                    >
+                    Grid.Column="0">
                 <Grid  >
                     <Grid.RowDefinitions>
                         <RowDefinition/>

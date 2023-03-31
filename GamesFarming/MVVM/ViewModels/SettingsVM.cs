@@ -81,9 +81,6 @@ namespace GamesFarming.MVVM.ViewModels
             }
         }
 
-
-
-
         private string _cfg;
 
         public string Cfg

@@ -10,10 +10,12 @@ namespace GamesFarming.MVVM.Models.Steam
         public static int HoursFarming = UserSettings.GetFarmTimeHours();
         public static int MinutesFarming = UserSettings.GetFarmTimeMinutes();
         public static int DaysSpanCS = 7;
-        public static int DaysSpanTF = 14;
+        public static int DaysSpanTF = 7;
         public static TimeSpan LaunchSpanCS => new TimeSpan(DaysSpanCS, HoursFarming, MinutesFarming, 0);
         public static TimeSpan LaunchSpanTF => new TimeSpan(DaysSpanTF, HoursFarming, MinutesFarming, 0);
         public static TimeSpan FarmingTime => new TimeSpan(HoursFarming, MinutesFarming, 0);
+
+        public static int FarmingSeconds => (int)FarmingTime.TotalSeconds;
 
         public static bool NeedToLaunch(DateTime last, int gameCode)
         {

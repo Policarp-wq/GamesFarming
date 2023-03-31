@@ -1,4 +1,6 @@
-﻿using GamesFarming.DataBase;
+﻿using FastSerialization;
+using GamesFarming.DataBase;
+using GamesFarming.User;
 
 namespace GamesFarming.MVVM.Models
 {
@@ -19,7 +21,15 @@ namespace GamesFarming.MVVM.Models
         public LaunchArgument(Account account)
         {
             Account = account;
-            Resolution = account.Resolution;
+            if(account.Cfg == null || account.GameCode != Decoder.CSCode)
+                Resolution = account.Resolution;
+            else
+            {
+                ConfigReader configReader = new ConfigReader(UserSettings.GetCfgPath(), account.Cfg);
+                var res = configReader.GetResolution();
+                if (res != null)
+                    Resolution = res;
+            }
         }
 
         public override string ToString()

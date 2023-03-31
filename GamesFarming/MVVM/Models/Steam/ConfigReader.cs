@@ -1,8 +1,12 @@
-﻿namespace GamesFarming.MVVM.Models
+﻿using System;
+using System.Linq;
+
+namespace GamesFarming.MVVM.Models
 {
     public class ConfigReader
     {
         //public const string CfgFolderPath = @"\steamapps\common\Counter-Strike Global Offensive\csgo\cfg\";
+        public const string ResolutionParameter = "mat_setvideomode";
         public readonly string Path;
         public readonly string ConfigParams;
         public ConfigReader(string cfgFolder, string cfgName)
@@ -24,11 +28,31 @@
         }
         public string GetLineWithParameter(string param) 
         {
-            foreach(var line in ConfigParams)
+            foreach(var line in ConfigParams.Split('\n'))
             {
-                
+                if(line.Contains(param))
+                    return line.Trim();
             }
-            return "";
+            return string.Empty;
+        }
+        public Resolution GetResolution()
+        {
+            var line = GetLineWithParameter(ResolutionParameter);
+            var args = line.Trim().Split(' ');
+            if (args.Length < 4)
+                return null;
+            try
+            {
+                return new Resolution(int.Parse(args[1]), int.Parse(args[2]));
+            }
+            catch(FormatException)
+            {
+                return new Resolution(-666, -666);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

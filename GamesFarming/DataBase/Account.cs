@@ -13,8 +13,6 @@ namespace GamesFarming.DataBase
         public Resolution Resolution { get; set; }
         public string Cfg { get; set; }
         public Connection Connect { get; set; }
-        public bool IgnoreRes
-            => new ConfigReader(UserSettings.GetCfgPath(), Cfg).ContainsParameter(SteamLibrary.ResolutionParameter);
 
         public DateTime LastLaunchDate { get; set; }
         private Account() { }
@@ -25,7 +23,7 @@ namespace GamesFarming.DataBase
             GameCode = gameCode;
             Optimization = optimize;
             Cfg = cfg;
-            Resolution = new Resolution(width, height);
+            Resolution = new Resolution(width, height);   
             LastLaunchDate = DateTime.Now;
         }
 

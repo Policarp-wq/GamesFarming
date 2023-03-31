@@ -13,6 +13,7 @@
             <BitmapImage x:Key="Cross" UriSource="/Resourses/Icons/cross.png"/>
             <BitmapImage x:Key="Question" UriSource="/Resourses/Icons/questionmark.png"/>
             <BitmapImage x:Key="Help" UriSource="/Resourses/Icons/help.png"/>
+            <BitmapImage x:Key="Timer" UriSource="/Resourses/Icons/timer.png"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/TextBlockThemes.xaml"/>
                 <ResourceDictionary Source="Themes/TextBoxThemes.xaml"/>

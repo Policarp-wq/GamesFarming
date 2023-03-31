@@ -1,69 +1,80 @@
-﻿using GamesFarming.DataBase;
-using GamesFarming.GUI;
+﻿using GamesFarming.GUI;
 using GamesFarming.MVVM.Models.PC;
 using GamesFarming.MVVM.Models.Steam;
+using GamesFarming.MVVM.Stores;
+using GamesFarming.MVVM.ViewModels;
+using GamesFarming.MVVM.Views;
 using GamesFarming.User;
-using Microsoft.Diagnostics.Tracing.AutomatedAnalysis;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Threading;
 
 namespace GamesFarming.MVVM.Models
 {
     internal class FarmingManager
     {
-        private static int _seconds = 0;
         private readonly SteamStarter _starter;
+        private TimerView _timerView;
 
-        public DispatcherTimer LaunchTimer { get; private set; }
+        public Timer LaunchTimer;
 
         public event Action OnTimerStopped;
-        public bool IsTimerStopped{ get; private set; }
-        public Action OnTick { get; set; }
-        public FarmProgress FarmingProgress;
+        public FarmProgress FarmingProgress { get; set; }
 
-        public FarmingManager(string steamPath, FarmProgress progress)
+        public const int UpdateTickMilliSeconds = 30000;
+
+        public FarmingManager(string steamPath, FarmProgress progress, NavigationStore store)
         {
             _starter = new SteamStarter(steamPath);
             FarmingProgress = progress;
-            ResetTimer();
-            IsTimerStopped = true;
-            OnTimerStopped += () => { CloseFarmApps(); FarmingProgress.Up(); };
+            LaunchTimer = new Timer();
+            var _navigationStore = store;
+            _timerView = new TimerView();
+            _timerView.DataContext = new TimerVM(LaunchTimer) { TimerView = _timerView };
+            LaunchTimer.TimerStarted += () => 
+            {
+                store.MainWindow.Dispatcher.Invoke(() => _timerView.Show());         
+            };
+            LaunchTimer.TimerStopped += () => 
+            {
+                CloseFarmApps(); FarmingProgress.Up(); store.MainWindow.Dispatcher.Invoke( () => _timerView.Close());
+            };
         }
-        public async void StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
+        public void StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
         {
-            ResetTimer();
-            _seconds = 0;
             int groupCnt = UserSettings.GetAccsInGroup();
             var dividedGroups = new List<IEnumerable<LaunchArgument>>(GetDivivded(args, groupCnt));
             FarmingProgress.AccountsCnt = args.Count();
             FarmingProgress.Step = dividedGroups[0].Count();
             int index = 0;
-            await Task.Run(() =>
+            Thread groupsStarter = new Thread(() =>
             {
-                while (index < dividedGroups.Count || !IsTimerStopped)
+                while (index < dividedGroups.Count || LaunchTimer.IsRunning)
                 {
                     if (cancellationToken.IsCancellationRequested)
                         break;
-                    if (IsTimerStopped)
+                    if (!LaunchTimer.IsRunning)
                     {
                         var group = dividedGroups[index];
-                        _starter.StartByArgsInOrder(group, cancellationToken, null, LaunchTimer.Start, (arg) => arg.ToString());//Task wait
-                        IsTimerStopped = false;
+                        Task starting = new Task(
+                            () =>_starter.StartByArgsInOrder(group, cancellationToken, null,
+                                () => LaunchTimer.Start(LaunchTimeManager.FarmingSeconds), (arg) => arg.ToString()), cancellationToken);
+                        starting.Start();
+                        starting.Wait();
                         index++;
                     }
-                    if (!(index < dividedGroups.Count || !IsTimerStopped))
+                    if (!(index < dividedGroups.Count || LaunchTimer.IsRunning))
                         break;
-                    Thread.Sleep(30000);
+                    Thread.Sleep(UpdateTickMilliSeconds);
                 }
-                StopTimer();
+                LaunchTimer.Stop();
                 onEnding?.Invoke();
             });
+            groupsStarter.SetApartmentState(ApartmentState.STA);
+            groupsStarter.Start();
         }
 
         private IEnumerable<IEnumerable<LaunchArgument>> GetDivivded(IEnumerable<LaunchArgument> args, int groupCnt)
@@ -89,15 +100,6 @@ namespace GamesFarming.MVVM.Models
             }
             return divided;
         }
-
-        public void StopTimer()
-        {
-            LaunchTimer.Stop();
-            ResetTimer();
-            IsTimerStopped = true;
-            OnTimerStopped?.Invoke();
-        }
-
         public void CloseFarmApps()
         {
             TaskManager.CloseProcces("steam");
@@ -105,25 +107,6 @@ namespace GamesFarming.MVVM.Models
             TaskManager.CloseProcces("csgo");
         }
 
-        private void Tick(object sender, EventArgs e)
-        {
-            OnTick?.Invoke();
-            _seconds++;
-            if (TimeSpan.FromSeconds(_seconds) == LaunchTimeManager.FarmingTime)
-            {
-                StopTimer();
-            }
-        }
-
-        private void ResetTimer()
-        {
-            LaunchTimer = new DispatcherTimer
-            {
-                Interval = new TimeSpan(0, 0, 1)
-            };
-            LaunchTimer.Tick += Tick;
-            _seconds = 0;
-        }
 
         public void ClearCloudErrors(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken)
         {

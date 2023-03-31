@@ -69,7 +69,7 @@ namespace GamesFarming.MVVM.ViewModels
             SelectedAccounts = new List<Account>();
             FarmingProgress = new FarmProgress();
             FarmingProgress.Updated += OnFarmingProgressUpdated;
-             _manager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress);
+             _manager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress, navigationStore);
 
             Start = new RelayCommand(() => OnStart());
             Delete = new RelayCommand(() => DeleteAccounts());

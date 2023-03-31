@@ -1,0 +1,40 @@
+﻿<Window x:Class="GamesFarming.MVVM.Views.TimerView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GamesFarming.MVVM.Views"
+        mc:Ignorable="d"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Icon="{StaticResource Timer}"
+        Background="{StaticResource Primary}"
+        Title="Timer" Height="70" Width="120">
+    <Border Background="{StaticResource Primary}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid
+                Background="#e6e6ff">
+                <Button VerticalAlignment="Top"
+                    HorizontalAlignment="Right"
+                    Margin="0"
+                    Width="25"
+                    Height="25"
+                Style="{StaticResource StandartButton}"
+                    Command="{Binding Close}">
+                    <Image Source="{StaticResource Cross}"/>
+                </Button>
+            </Grid>
+            <TextBlock 
+                Grid.Row="1"
+                FontSize="32"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Text="{Binding StringTimer}"/>
+        </Grid>
+    </Border>
+</Window>

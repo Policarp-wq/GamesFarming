@@ -240,7 +240,7 @@
     <Compile Include="MVVM\Models\Accounts\AccountPresentationComparer.cs" />
     <Compile Include="MVVM\Models\Accounts\Filters.cs" />
     <Compile Include="MVVM\Models\BatDeserializer.cs" />
-    <Compile Include="MVVM\Models\ConfigReader.cs" />
+    <Compile Include="MVVM\Models\Steam\ConfigReader.cs" />
     <Compile Include="MVVM\Models\PC\TaskManager.cs" />
     <Compile Include="MVVM\Models\Server\Connection.cs" />
     <Compile Include="MVVM\Models\FileSafeAccess.cs" />
@@ -253,9 +253,11 @@
     <Compile Include="MVVM\Models\Steam\FarmProgress.cs" />
     <Compile Include="MVVM\Models\Steam\LaunchTimeManager.cs" />
     <Compile Include="MVVM\Models\Validator.cs" />
+    <Compile Include="MVVM\Models\Timer.cs" />
     <Compile Include="MVVM\ViewModels\ServerRegistartionVM.cs" />
     <Compile Include="MVVM\ViewModels\ServersListVM.cs" />
     <Compile Include="MVVM\ViewModels\SettingsVM.cs" />
+    <Compile Include="MVVM\ViewModels\TimerVM.cs" />
     <Compile Include="MVVM\Views\ServerRegistrationView.xaml.cs">
       <DependentUpon>ServerRegistrationView.xaml</DependentUpon>
     </Compile>
@@ -264,6 +266,9 @@
     </Compile>
     <Compile Include="MVVM\Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\Views\TimerView.xaml.cs">
+      <DependentUpon>TimerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="User\UserSettings.cs" />
     <Page Include="MainWindow.xaml">
@@ -300,6 +305,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MVVM\Views\SettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\Views\TimerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -407,6 +416,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resourses\Icons\icon3.png" />
+    <Resource Include="Resourses\Icons\timer.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

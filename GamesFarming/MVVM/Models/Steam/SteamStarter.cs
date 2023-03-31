@@ -88,12 +88,12 @@ namespace GamesFarming.MVVM.Models
             {
                 try
                 {
-                    Process.Start(steamProcces);
-                    Thread.Sleep(SteamLibrary.SteamLaunchMilliSeconds);
-                    Clipboard.SetText(arg.Account.Login);
-                    Process.Start(_guardProcces);
-                    Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
-                    arg.Account.LastLaunchDate = DateTime.Now;
+                    //Process.Start(steamProcces);
+                    //Thread.Sleep(SteamLibrary.SteamLaunchMilliSeconds);
+                    //Clipboard.SetText(arg.Account.Login);
+                    //Process.Start(_guardProcces);
+                    //Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
+                    //arg.Account.LastLaunchDate = DateTime.Now;
                     onSteamLaunched?.Invoke();
                     Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
                 }
@@ -108,28 +108,23 @@ namespace GamesFarming.MVVM.Models
 
         private static void StartThreads(IEnumerable<Thread> launchProcesses, CancellationToken cancellationToken, Action onStartEnd = null)
         {
-            new Thread(() =>
+            Task launch = new Task(() =>
             {
-                Task launch = new Task(() =>
+                int cnt = 0;
+                foreach (var accountLaunch in launchProcesses)
                 {
-                    int cnt = 0;
-                    foreach (var accountLaunch in launchProcesses)
-                    {
-                        if (cnt % 5 == 0 && cnt != 0)
-                            Thread.Sleep(60000);
-                        if (cancellationToken.IsCancellationRequested)
-                            break;
-                        accountLaunch.Start();
-                        accountLaunch.Join();
-                        cnt++;
-                    }
-                }, cancellationToken);
-                launch.Start();
-                launch.Wait();
-                onStartEnd?.Invoke();
-            })
-            { ApartmentState = ApartmentState.STA }.Start();
-
+                    if (cnt % 5 == 0 && cnt != 0)
+                        Thread.Sleep(60000);
+                    //if (cancellationToken.IsCancellationRequested)
+                    //    break;
+                    accountLaunch.Start();
+                    accountLaunch.Join();
+                    cnt++;
+                }
+            }, cancellationToken);
+            launch.Start();
+            launch.Wait();
+            onStartEnd?.Invoke();
         }
 
     }
