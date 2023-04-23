@@ -5,6 +5,7 @@ using GamesFarming.MVVM.Views;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace GamesFarming.MVVM.ViewModels
@@ -46,6 +47,8 @@ namespace GamesFarming.MVVM.ViewModels
         }
         public void OnRemoveServer()
         {
+            if (MessageBox.Show("Want to delete servers?", "Delete", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return;
             ServerManager.Remove(SelectedServers);
             SelectedServers.Clear();
         }

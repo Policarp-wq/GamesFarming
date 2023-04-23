@@ -13,7 +13,7 @@ namespace GamesFarming.MVVM.Models
         public const int DefaultAccsInGroup = 10;
         public static int SteamLaunchSeconds => UserSettings.GetLaunchSeconds();
         public static int SteamLaunchMilliSeconds => SteamLaunchSeconds * 1000;
-        public static int SteamAutorizationSeconds = 20;
+        public static int SteamAutorizationSeconds = 25;
         public static int SteamAutorizationMilliSeconds => SteamAutorizationSeconds * 1000;
         public static int CloudCleanSeconds = 110;
         public static int CloudCleanMilliSeconds => CloudCleanSeconds * 1000;

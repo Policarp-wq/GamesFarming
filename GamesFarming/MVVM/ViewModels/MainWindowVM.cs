@@ -24,17 +24,25 @@ namespace GamesFarming.MVVM.ViewModels
         public ICommand OpenSettings { get; set; }
         public ICommand GetHelp { get; set; }
         public ICommand Close { get; set; }
+        public ICommand DragWindow { get; set; }
         public readonly DBAccess<Account> AccountsDB;
+
         public MainWindowVM(NavigationStore navigationStore)
         {
             AccountsDB = new DBAccess<Account>(DBKeys.AccountKey);
             _navigationStore = navigationStore;
             _navigationStore.CurrentVMChanged += OnCurrentVMChanged;
 
+            var accountsVM = new AccountsListVM(navigationStore);
+            var serversVM = new ServersListVM();
+            var registerVM = new AccountRegistrationVM();
+
+            _navigationStore.CurrentVM = accountsVM;
+            DragWindow = new RelayCommand(() => _navigationStore.MainWindow.DragMove());
             Close = new RelayCommand(() => _navigationStore.MainWindow.Hide());
-            MoveToAccounts = new RelayCommand(() => _navigationStore.CurrentVM = new AccountsListVM(navigationStore));
-            MoveToServers = new RelayCommand(() => _navigationStore.CurrentVM = new ServersListVM());
-            MoveToRegistration = new RelayCommand(() => _navigationStore.CurrentVM = new AccountRegistrationVM());
+            MoveToAccounts = new RelayCommand(() => _navigationStore.CurrentVM = accountsVM);
+            MoveToServers = new RelayCommand(() => _navigationStore.CurrentVM = serversVM);
+            MoveToRegistration = new RelayCommand(() => _navigationStore.CurrentVM = registerVM);
             Import = new RelayCommand(() => ImportFiles());
             OpenSettings = new RelayCommand(() => OnOpenSettings());
             GetHelp = new RelayCommand(() => MessageBox.Show(HelpMessage, "Info", MessageBoxButtons.OK));

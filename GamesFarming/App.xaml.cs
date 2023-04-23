@@ -32,7 +32,7 @@ namespace GamesFarming
                 {
                     TrayIcon = _trayIcon,
                 };
-                _navigationStore.CurrentVM = new AccountsListVM(_navigationStore);
+                //_navigationStore.CurrentVM = new AccountsListVM(_navigationStore);
                 _mainWindow = new MainWindow() { DataContext = new MainWindowVM(_navigationStore) };
                 _navigationStore.MainWindow = _mainWindow;
                 _mainWindow.Show();
@@ -55,13 +55,9 @@ namespace GamesFarming
             var appName = Process.GetCurrentProcess().ProcessName;
             if(TaskManager.GetProcesses(appName).Count() > 1)
             {
-                var res = MessageBox.Show("You have already started farming panel! Want to kill all processes?",
-                    "Warning!", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                if(res == MessageBoxResult.Yes)
-                {
-                    TaskManager.CloseProcces(appName);
-                }
-                else Current.Shutdown();
+                MessageBox.Show("Another instance of the app is already running",
+                    "Warning!", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Current.Shutdown();
             }
                 
         }
@@ -76,7 +72,7 @@ namespace GamesFarming
             };
             icon.DoubleClick += OnTreyIconDoubleClicked;
             icon.ContextMenu = new Froms.ContextMenu();
-            icon.ContextMenu.MenuItems.Add(new System.Windows.Forms.MenuItem("Exit", (e, a) => Current.Shutdown()));
+            icon.ContextMenu.MenuItems.Add(new Froms.MenuItem("Exit", (e, a) => Current.Shutdown()));
             return icon;
         }
         protected override void OnExit(ExitEventArgs e)

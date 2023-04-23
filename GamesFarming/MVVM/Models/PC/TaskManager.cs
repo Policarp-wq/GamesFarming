@@ -14,6 +14,7 @@ namespace GamesFarming.MVVM.Models.PC
                 try 
                 {
                     procces.Kill();
+                    procces.WaitForExit();
                 }
                 catch(Exception ex)
                 {

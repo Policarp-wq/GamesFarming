@@ -10,17 +10,12 @@ namespace GamesFarming.MVVM.Models
 {
     internal class SteamStarter
     {
-        private readonly ProcessStartInfo _steamProcces;
         private readonly ProcessStartInfo _guardProcces;
         public string Path { get; private set; }
 
         public SteamStarter(string filePath)
         {
             Path = filePath;
-            _steamProcces = new ProcessStartInfo
-            {
-                FileName = Path
-            };
             _guardProcces = new ProcessStartInfo
             {
                 FileName = SteamLibrary.GuardPath
@@ -32,7 +27,7 @@ namespace GamesFarming.MVVM.Models
             List<Thread> threads = new List<Thread>();
             foreach (var argument in args)
             {
-                threads.Add(GetLaunchThread(argument, argToString, onSteamLaunched));
+                threads.Add(GetLaunchThread(argument, argToString, cancellationToken, onSteamLaunched));
             }
             StartThreads(threads, cancellationToken, () => onStartEnd?.Invoke());
         }
@@ -69,7 +64,7 @@ namespace GamesFarming.MVVM.Models
                     if (connect != null)
                         additionalArg += " " + connect.ToString();
                 }   
-                threads.Add(GetLaunchThread(argument, argToString, onSteamLaunched, additionalArg));
+                threads.Add(GetLaunchThread(argument, argToString, cancellationToken, onSteamLaunched, additionalArg));
                 prevX = argument.Resolution.Width;
                 int prevY = argument.Resolution.Height;
                 mxHeight = Math.Max(mxHeight, prevY);
@@ -77,7 +72,8 @@ namespace GamesFarming.MVVM.Models
             StartThreads(threads, cancellationToken, () => onStartEnd?.Invoke());
         }
 
-        private Thread GetLaunchThread(LaunchArgument arg, Func<LaunchArgument, string> argToString, Action onSteamLaunched = null, string additional = "")
+        private Thread GetLaunchThread(LaunchArgument arg, Func<LaunchArgument, string> argToString, CancellationToken cancellationToken,
+            Action onSteamLaunched = null, string additional = "")
         {
             var steamProcces = new ProcessStartInfo
             {
@@ -88,9 +84,13 @@ namespace GamesFarming.MVVM.Models
             {
                 try
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
                     Process.Start(steamProcces);
                     Thread.Sleep(SteamLibrary.SteamLaunchMilliSeconds);
                     Clipboard.SetText(arg.Account.Login);
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
                     Process.Start(_guardProcces);
                     Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
                     arg.Account.LastLaunchDate = DateTime.Now;
@@ -102,19 +102,21 @@ namespace GamesFarming.MVVM.Models
                     MessageBox.Show(ex.Message);
                 }
             });
+            thread.IsBackground= true;
             thread.SetApartmentState(ApartmentState.STA);
             return thread;
         }
 
         private static void StartThreads(IEnumerable<Thread> launchProcesses, CancellationToken cancellationToken, Action onStartEnd = null)
         {
+
             Task launch = new Task(() =>
             {
                 int cnt = 0;
                 foreach (var accountLaunch in launchProcesses)
                 {
-                    if (cnt % 5 == 0 && cnt != 0)
-                        Thread.Sleep(60000);
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
                     accountLaunch.Start();
                     accountLaunch.Join();
                     cnt++;
@@ -122,7 +124,8 @@ namespace GamesFarming.MVVM.Models
             }, cancellationToken);
             launch.Start();
             launch.Wait();
-            onStartEnd?.Invoke();
+            if (!cancellationToken.IsCancellationRequested)
+                onStartEnd?.Invoke();
         }
 
     }

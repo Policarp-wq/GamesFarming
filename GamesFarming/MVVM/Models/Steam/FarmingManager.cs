@@ -10,14 +10,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
+using System.Windows.Forms;
 
 namespace GamesFarming.MVVM.Models
 {
     internal class FarmingManager
     {
         private readonly SteamStarter _starter;
-        private TimerView _timerView;
 
         public Timer LaunchTimer;
 
@@ -26,24 +25,18 @@ namespace GamesFarming.MVVM.Models
 
         public const int UpdateTickMilliSeconds = 30000;
 
-        public FarmingManager(string steamPath, FarmProgress progress, NavigationStore store)
+        public FarmingManager(string steamPath, FarmProgress progress)
         {
             _starter = new SteamStarter(steamPath);
             FarmingProgress = progress;
             LaunchTimer = new Timer();
-            var _navigationStore = store;
-            _timerView = new TimerView();
-            _timerView.DataContext = new TimerVM(LaunchTimer) { TimerView = _timerView };
-            LaunchTimer.TimerStarted += () => 
-            {
-                store.MainWindow.Dispatcher.Invoke(() => _timerView.Show());         
-            };
             LaunchTimer.TimerStopped += () => 
             {
-                CloseFarmApps(); FarmingProgress.Up(); store.MainWindow.Dispatcher.Invoke( () => _timerView.Hide());
+                CloseFarmApps();
+                FarmingProgress.Up();
             };
         }
-        public void StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
+        public TimeSpan StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
         {
             int groupCnt = UserSettings.GetAccsInGroup();
             var dividedGroups = new List<IEnumerable<LaunchArgument>>(GetDivivded(args, groupCnt));
@@ -55,7 +48,10 @@ namespace GamesFarming.MVVM.Models
                 while (index < dividedGroups.Count || LaunchTimer.IsRunning)
                 {
                     if (cancellationToken.IsCancellationRequested)
-                        break;
+                    {
+                        LaunchTimer.Stop();
+                        return;
+                    }  
                     if (!LaunchTimer.IsRunning)
                     {
                         var group = dividedGroups[index];
@@ -70,11 +66,11 @@ namespace GamesFarming.MVVM.Models
                         break;
                     Thread.Sleep(UpdateTickMilliSeconds);
                 }
-                LaunchTimer.Stop();
                 onEnding?.Invoke();
             });
             groupsStarter.SetApartmentState(ApartmentState.STA);
             groupsStarter.Start();
+            return TimeSpan.FromSeconds(dividedGroups.Count * LaunchTimeManager.FarmingSeconds);
         }
 
         private IEnumerable<IEnumerable<LaunchArgument>> GetDivivded(IEnumerable<LaunchArgument> args, int groupCnt)
@@ -102,9 +98,16 @@ namespace GamesFarming.MVVM.Models
         }
         public void CloseFarmApps()
         {
-            TaskManager.CloseProcces("steam");
-            TaskManager.CloseProcces("hl2");
-            TaskManager.CloseProcces("csgo");
+            try
+            {
+                TaskManager.CloseProcces("hl2");
+                TaskManager.CloseProcces("csgo");
+                TaskManager.CloseProcces("steam");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("failed to close the programms! " + ex.Message);
+            }
         }
 
 

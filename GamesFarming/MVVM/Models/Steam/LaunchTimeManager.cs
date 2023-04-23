@@ -7,8 +7,8 @@ namespace GamesFarming.MVVM.Models.Steam
     {
         public const int DefaultHoursFarming = 6;
         public const int DefaultMinutesFarming = 20;
-        public static int HoursFarming = UserSettings.GetFarmTimeHours();
-        public static int MinutesFarming = UserSettings.GetFarmTimeMinutes();
+        public static int HoursFarming => UserSettings.GetFarmTimeHours();
+        public static int MinutesFarming => UserSettings.GetFarmTimeMinutes();
         public static int DaysSpanCS = 7;
         public static int DaysSpanTF = 7;
         public static TimeSpan LaunchSpanCS => new TimeSpan(DaysSpanCS, HoursFarming, MinutesFarming, 0);

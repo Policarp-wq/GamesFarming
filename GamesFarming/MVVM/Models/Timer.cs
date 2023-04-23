@@ -7,7 +7,6 @@ namespace GamesFarming.MVVM.Models
     {
         private DispatcherTimer _dispatcherTimer;
         public int CurrentSeconds { get; private set; }
-        public int TimerSeconds { get; private set; }
         public bool IsRunning = false;
         public event Action TimerStarted;
         public event Action TimerStopped;
@@ -21,9 +20,9 @@ namespace GamesFarming.MVVM.Models
 
         private void OnTick(object sender, EventArgs e)
         {
-            ++CurrentSeconds;
+            --CurrentSeconds;
             TimerTicked?.Invoke();
-            if (CurrentSeconds >= TimerSeconds)
+            if (CurrentSeconds <= 0)
             {
                 Stop();
             }
@@ -31,8 +30,7 @@ namespace GamesFarming.MVVM.Models
 
         public void Start(int seconds)
         {
-            CurrentSeconds = 0;
-            TimerSeconds = seconds;
+            CurrentSeconds = seconds;
             _dispatcherTimer.Start();
             IsRunning = true;
             TimerStarted?.Invoke();

@@ -40,6 +40,7 @@ namespace GamesFarming.MVVM.ViewModels
             }
         }
         public FarmProgress FarmingProgress { get; set; }
+        public string StringTimer => TimeSpan.FromSeconds(_manager.LaunchTimer.CurrentSeconds).ToString();
 
         public int Minimum = 0;
         public int Maximum => FarmingProgress.AccountsCnt;
@@ -57,19 +58,20 @@ namespace GamesFarming.MVVM.ViewModels
         public ICommand SelectAll { get; set; }
 
         public readonly DBAccess<Account> AccountsDB;
-        
 
         public AccountsListVM(NavigationStore navigationStore)
         {
             NavigationStore = navigationStore;
             AccountsDB = new DBAccess<Account>(DBKeys.AccountKey);
-            FilterableAccounts = new FilterableCollection<AccountPresentation>(AccountsDB.GetItems().Select(x => new AccountPresentation(x))); // in thread
+            FilterableAccounts = new FilterableCollection<AccountPresentation>(AccountsDB.GetItems().Select(x => new AccountPresentation(x)));
             SubscribeSelectionChanged(FilterableAccounts.Items);
             FilterableAccounts.FilterChanged += () => OnPropertyChanged(nameof(Accounts));
             SelectedAccounts = new List<Account>();
             FarmingProgress = new FarmProgress();
             FarmingProgress.Updated += OnFarmingProgressUpdated;
-             _manager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress, navigationStore);
+
+            _manager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress);
+            _manager.LaunchTimer.TimerTicked += () => OnPropertyChanged(nameof(StringTimer));
 
             Start = new RelayCommand(() => OnStart());
             Delete = new RelayCommand(() => DeleteAccounts());
@@ -132,7 +134,7 @@ namespace GamesFarming.MVVM.ViewModels
                     ++cnt;
             }
             if (cnt > 0)
-                NavigationStore.TrayIcon.ShowBalloonTip(3000, "Attention!", $"You have {cnt} accounts to farm!",
+                NavigationStore.TrayIcon.ShowBalloonTip(2, "Attention!", $"You have {cnt} accounts to farm!",
                     System.Windows.Forms.ToolTipIcon.Info);
         }
 
@@ -154,16 +156,18 @@ namespace GamesFarming.MVVM.ViewModels
             {
                 _cancellationTokenSource = new CancellationTokenSource();
                 var selectedArgs = new List<LaunchArgument>(SelectedAccounts.Select(acc => new LaunchArgument(acc)));
-                NavigationStore.TrayIcon.ShowBalloonTip(2000, "Start", $"Farming has started with {selectedArgs.Count} accounts",
-                    System.Windows.Forms.ToolTipIcon.Info);
-               _manager.StartFarming(selectedArgs, _cancellationTokenSource.Token, () =>
-               {
-                   UpdateLaunchTime(selectedArgs.Select(x => x.Account));
-                   Update();
-                   NavigationStore.TrayIcon.ShowBalloonTip(3000, "Success", "Selected accounts has been farmed", System.Windows.Forms.ToolTipIcon.Info);
-               });
+                var farmTime = _manager.StartFarming(selectedArgs, _cancellationTokenSource.Token, () =>
+                {
+                    Update();
+                    if (!_cancellationTokenSource.IsCancellationRequested)
+                    {
+                         UpdateLaunchTime(selectedArgs.Select(x => x.Account));
+                         NavigationStore.TrayIcon.ShowBalloonTip(3, "Success", "Selected accounts has been farmed", System.Windows.Forms.ToolTipIcon.Info);
+                    }
+                });
+                NavigationStore.TrayIcon.ShowBalloonTip(5, "Start", $"Farming has started with {selectedArgs.Count} accounts for {farmTime}",
+                                    System.Windows.Forms.ToolTipIcon.Info);
 
-                
             }
             catch (System.Exception ex)
             {
@@ -184,7 +188,7 @@ namespace GamesFarming.MVVM.ViewModels
             }
             catch(ObjectDisposedException)
             {
-                MessageBox.Show("Cancel has already been pressed. Just wait or close the panel");
+                
             }
             catch(Exception ex)
             {
