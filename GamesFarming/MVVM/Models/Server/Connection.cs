@@ -11,7 +11,7 @@
         }
         public override string ToString()
         {
-            return $"+connect \"connect {IP};" + (Password.Length > 0 ? $"password {Password};\"" : "\"");
+            return $"+connect \"connect {IP};" + (Password != null && Password.Length > 0 ? $"password {Password};\"" : "\"");
         }
         public override bool Equals(object obj)
         {

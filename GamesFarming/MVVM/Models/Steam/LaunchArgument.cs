@@ -1,5 +1,7 @@
 ﻿using GamesFarming.DataBase;
 using GamesFarming.User;
+using System;
+using System.Windows.Forms;
 
 namespace GamesFarming.MVVM.Models
 {
@@ -12,7 +14,7 @@ namespace GamesFarming.MVVM.Models
 
         public static int DefaultCode = 730;
 
-        public string SteamLaunch => $"-noreactlogin -login {Account.Login} {Account.Password}";
+        public string SteamLaunch => $"-noreactlogin -noverifyfiles -login {Account.Login} {Account.Password}";
 
         public Account Account { get; set; }
         public Resolution Resolution { get; set; }
@@ -20,21 +22,31 @@ namespace GamesFarming.MVVM.Models
         public LaunchArgument(Account account)
         {
             Account = account;
-            if(account.Cfg == null || account.GameCode != Decoder.CSCode)
-                Resolution = account.Resolution;
-            else
+            try
             {
-                ConfigReader configReader = new ConfigReader(UserSettings.GetCfgPath(), account.Cfg);
-                var res = configReader.GetResolution();
-                if (res != null)
-                    Resolution = res;
+                if (account.Cfg == null || account.GameCode != Decoder.CSCode)
+                    Resolution = account.Resolution;
+                else
+                {
+                    ConfigReader configReader = new ConfigReader(UserSettings.GetCfgPath(), account.Cfg);
+                    var res = configReader.GetResolution();
+                    if (res != null)
+                        Resolution = res;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
             }
         }
 
         public override string ToString()
         {
-            return
-                $"-nofriendsui -nochatui -silent -login {Account.Login} {Account.Password} -applaunch {Account.GameCode} -windowed {ResolutionParam} +exec {Cfg} {Connect} {Account.Optimization} -nohltv";
+                return
+                    $"-nofriendsui -noverifyfiles -noreactlogin -nochatui -silent" +
+                    $" -login {Account.Login} {Account.Password} -applaunch {Account.GameCode}" +
+                    $" -windowed {ResolutionParam} +exec {Cfg} {Connect} {Account.Optimization} -nohltv";
         }
 
     }

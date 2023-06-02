@@ -50,6 +50,13 @@ namespace GamesFarming
             }
         }
 
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            MessageBox.Show("An unhandled exception just occurred: " + e.Exception.Message,
+                "Exception Sample", MessageBoxButton.OK, MessageBoxImage.Error);
+            e.Handled = true;
+        }
+
         private void CheckIsAlreadyRunning()
         {
             var appName = Process.GetCurrentProcess().ProcessName;

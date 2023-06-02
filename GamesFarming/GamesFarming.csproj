@@ -246,6 +246,7 @@
     <Compile Include="MVVM\Models\Accounts\AccountPresentationComparer.cs" />
     <Compile Include="MVVM\Models\Accounts\Filters.cs" />
     <Compile Include="MVVM\Models\BatDeserializer.cs" />
+    <Compile Include="MVVM\Models\Facilities\TimeQueue.cs" />
     <Compile Include="MVVM\Models\Steam\ConfigReader.cs" />
     <Compile Include="MVVM\Models\PC\TaskManager.cs" />
     <Compile Include="MVVM\Models\Server\Connection.cs" />
@@ -259,7 +260,7 @@
     <Compile Include="MVVM\Models\Steam\FarmProgress.cs" />
     <Compile Include="MVVM\Models\Steam\LaunchTimeManager.cs" />
     <Compile Include="MVVM\Models\Validator.cs" />
-    <Compile Include="MVVM\Models\Timer.cs" />
+    <Compile Include="MVVM\Models\Facilities\Timer.cs" />
     <Compile Include="MVVM\ViewModels\ServerRegistartionVM.cs" />
     <Compile Include="MVVM\ViewModels\ServersListVM.cs" />
     <Compile Include="MVVM\ViewModels\SettingsVM.cs" />

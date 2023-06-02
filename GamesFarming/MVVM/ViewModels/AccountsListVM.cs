@@ -167,7 +167,6 @@ namespace GamesFarming.MVVM.ViewModels
                 });
                 NavigationStore.TrayIcon.ShowBalloonTip(5, "Start", $"Farming has started with {selectedArgs.Count} accounts for {farmTime}",
                                     System.Windows.Forms.ToolTipIcon.Info);
-
             }
             catch (System.Exception ex)
             {
@@ -214,6 +213,7 @@ namespace GamesFarming.MVVM.ViewModels
         {
             Tuple<object, object> tuple = p as Tuple<object, object>;
             string output = "";
+            Account account = null;
             if (tuple is null)
                 output = "Wrong convertation : " + p.ToString();
             else
@@ -222,11 +222,11 @@ namespace GamesFarming.MVVM.ViewModels
                 string gameCode = tuple.Item2.ToString();
                 if (!int.TryParse(gameCode, out int code))
                     output = "Wrong code : " + gameCode.ToString();
-                else output = Accounts.Where(acc => acc.Login == login && acc.GameCode == code)
+                else account = Accounts.Where(acc => acc.Login == login && acc.GameCode == code)
                                         .Select(acc => acc.Account)
-                                        .FirstOrDefault()
-                                        .ToString();
+                                        .FirstOrDefault();
             }
+            output = account.ToString() + "\n\nLaunch argument is: {" + (new LaunchArgument(account)).ToString() + "}";
             MessageBox.Show(output);
 
         }
