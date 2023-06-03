@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace GamesFarming.MVVM.Models
 {
-    internal class LaunchArgument
+    public class LaunchArgument
     {
         public const string DefaultOptimization = "-novid -nosound -low -nojoy -noshader -nofbo -nodcaudio -nomsaa +set vid level 0";
         private string Connect => Account.Connect is null? "" : "+connect " + Account.Connect.ToString();

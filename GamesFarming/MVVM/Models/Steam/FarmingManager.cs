@@ -1,4 +1,5 @@
 ﻿using GamesFarming.GUI;
+using GamesFarming.MVVM.Models.Facilities;
 using GamesFarming.MVVM.Models.PC;
 using GamesFarming.MVVM.Models.Steam;
 using GamesFarming.MVVM.Stores;
@@ -14,7 +15,16 @@ using System.Windows.Forms;
 
 namespace GamesFarming.MVVM.Models
 {
-    internal class FarmingManager
+
+    public class ArgsGroup
+    {
+        public ArgsGroup(IEnumerable<>) 
+        {
+
+        }
+
+    }
+    public class FarmingManager
     {
         private readonly SteamStarter _starter;
 
@@ -29,48 +39,54 @@ namespace GamesFarming.MVVM.Models
         {
             _starter = new SteamStarter(steamPath);
             FarmingProgress = progress;
-            LaunchTimer = new Timer();
-            LaunchTimer.TimerStopped += () => 
-            {
-                CloseFarmApps();
-                FarmingProgress.Up();
-            };
+            
         }
+        //public TimeSpan StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
+        //{
+        //    int groupCnt = UserSettings.GetAccsInGroup();
+        //    var dividedGroups = new List<IEnumerable<LaunchArgument>>(GetDivivded(args, groupCnt));
+        //    FarmingProgress.AccountsCnt = args.Count();
+        //    FarmingProgress.Step = dividedGroups[0].Count();
+        //    int index = 0;
+        //    Thread groupsStarter = new Thread(() =>
+        //    {
+        //        while (index < dividedGroups.Count || LaunchTimer.IsRunning)
+        //        {
+        //            if (cancellationToken.IsCancellationRequested)
+        //            {
+        //                LaunchTimer.Stop();
+        //                return;
+        //            }  
+        //            if (!LaunchTimer.IsRunning)
+        //            {
+        //                var group = dividedGroups[index];
+        //                Task starting = new Task(
+        //                    () =>_starter.StartByArgsInOrder(group, cancellationToken, null,
+        //                        () => LaunchTimer.Start(LaunchTimeManager.FarmingSeconds), (arg) => arg.ToString()), cancellationToken);
+        //                starting.Start();
+        //                starting.Wait();
+        //                index++;
+        //            }
+        //            if (!(index < dividedGroups.Count || LaunchTimer.IsRunning))
+        //                break;
+        //            Thread.Sleep(UpdateTickMilliSeconds);
+        //        }
+        //        onEnding?.Invoke();
+        //    });
+        //    groupsStarter.SetApartmentState(ApartmentState.STA);
+        //    groupsStarter.Start();
+        //    return TimeSpan.FromSeconds(dividedGroups.Count * LaunchTimeManager.FarmingSeconds);
+        //}
+
         public TimeSpan StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
         {
             int groupCnt = UserSettings.GetAccsInGroup();
             var dividedGroups = new List<IEnumerable<LaunchArgument>>(GetDivivded(args, groupCnt));
             FarmingProgress.AccountsCnt = args.Count();
             FarmingProgress.Step = dividedGroups[0].Count();
-            int index = 0;
-            Thread groupsStarter = new Thread(() =>
-            {
-                while (index < dividedGroups.Count || LaunchTimer.IsRunning)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        LaunchTimer.Stop();
-                        return;
-                    }  
-                    if (!LaunchTimer.IsRunning)
-                    {
-                        var group = dividedGroups[index];
-                        Task starting = new Task(
-                            () =>_starter.StartByArgsInOrder(group, cancellationToken, null,
-                                () => LaunchTimer.Start(LaunchTimeManager.FarmingSeconds), (arg) => arg.ToString()), cancellationToken);
-                        starting.Start();
-                        starting.Wait();
-                        index++;
-                    }
-                    if (!(index < dividedGroups.Count || LaunchTimer.IsRunning))
-                        break;
-                    Thread.Sleep(UpdateTickMilliSeconds);
-                }
-                onEnding?.Invoke();
-            });
-            groupsStarter.SetApartmentState(ApartmentState.STA);
-            groupsStarter.Start();
-            return TimeSpan.FromSeconds(dividedGroups.Count * LaunchTimeManager.FarmingSeconds);
+            Tas
+            TimeQueue<IEnumerable<LaunchArgument>> timeQueue =
+                new TimeQueue<IEnumerable<LaunchArgument>>((group) => , (int)LaunchTimeManager.FarmingTime.TotalSeconds);
         }
 
         private IEnumerable<IEnumerable<LaunchArgument>> GetDivivded(IEnumerable<LaunchArgument> args, int groupCnt)
