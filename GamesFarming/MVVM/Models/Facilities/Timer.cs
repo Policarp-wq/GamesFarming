@@ -31,9 +31,9 @@ namespace GamesFarming.MVVM.Models
         public void Start(int seconds)
         {
             CurrentSeconds = seconds;
+            TimerStarted?.Invoke();
             _dispatcherTimer.Start();
             IsRunning = true;
-            TimerStarted?.Invoke();
         }
 
         public void Stop()

@@ -1,12 +1,9 @@
-﻿using GamesFarming.GUI;
-using GamesFarming.MVVM.Models.Facilities;
+﻿using GamesFarming.MVVM.Models.Facilities;
 using GamesFarming.MVVM.Models.PC;
 using GamesFarming.MVVM.Models.Steam;
-using GamesFarming.MVVM.Stores;
-using GamesFarming.MVVM.ViewModels;
-using GamesFarming.MVVM.Views;
 using GamesFarming.User;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,31 +13,37 @@ using System.Windows.Forms;
 namespace GamesFarming.MVVM.Models
 {
 
-    public class ArgsGroup
+    public class ArgsGroup : IEnumerable
     {
-        public ArgsGroup(IEnumerable<>) 
+        public List<LaunchArgument> LaunchArguments { get; set; }
+        public ArgsGroup(IEnumerable<LaunchArgument> ars) 
         {
-
+            LaunchArguments = new List<LaunchArgument>(ars);
         }
+        public int Count => LaunchArguments.Count;
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return LaunchArguments.GetEnumerator();
+        }
     }
     public class FarmingManager
     {
         private readonly SteamStarter _starter;
 
-        public Timer LaunchTimer;
-
-        public event Action OnTimerStopped;
         public FarmProgress FarmingProgress { get; set; }
-
-        public const int UpdateTickMilliSeconds = 30000;
+        public TimeQueue<ArgsGroup> ArgsGroupsQueue { get; private set; }
+        public Timer QueueTimer => ArgsGroupsQueue.QueueTimer;
+        public bool IsRunning { get; private set; }
 
         public FarmingManager(string steamPath, FarmProgress progress)
         {
             _starter = new SteamStarter(steamPath);
             FarmingProgress = progress;
-            
+            ArgsGroupsQueue = new TimeQueue<ArgsGroup>();
+            ArgsGroupsQueue.QueueIsEnded += () => CloseFarmApps();
         }
+
         //public TimeSpan StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
         //{
         //    int groupCnt = UserSettings.GetAccsInGroup();
@@ -78,18 +81,36 @@ namespace GamesFarming.MVVM.Models
         //    return TimeSpan.FromSeconds(dividedGroups.Count * LaunchTimeManager.FarmingSeconds);
         //}
 
-        public TimeSpan StartFarming(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onEnding = null)
+        public async Task<TimeSpan> StartFarming(IEnumerable<LaunchArgument> args, CancellationTokenSource tokenSource, Action onEnding = null)
         {
             int groupCnt = UserSettings.GetAccsInGroup();
-            var dividedGroups = new List<IEnumerable<LaunchArgument>>(GetDivivded(args, groupCnt));
-            FarmingProgress.AccountsCnt = args.Count();
-            FarmingProgress.Step = dividedGroups[0].Count();
-            Tas
-            TimeQueue<IEnumerable<LaunchArgument>> timeQueue =
-                new TimeQueue<IEnumerable<LaunchArgument>>((group) => , (int)LaunchTimeManager.FarmingTime.TotalSeconds);
+            var dividedGroups = new List<ArgsGroup>(GetDivivded(args, groupCnt));
+            FarmingProgress.AccountsCnt += args.Count();
+            if (IsRunning)
+            {
+                ArgsGroupsQueue.Add(dividedGroups);
+                return TimeSpan.FromSeconds(dividedGroups.Count * (int)LaunchTimeManager.FarmingTime.TotalSeconds);
+            }
+            FarmingProgress.Step = dividedGroups[0].Count;
+            ArgsGroupsQueue.QueueIsEnded += () => { CloseFarmApps(); IsRunning = false; FarmingProgress.Reset(); };
+            ArgsGroupsQueue.QueueIsEnded += onEnding;
+            IsRunning = true;
+            await Task.Run(() =>  ArgsGroupsQueue.Start(dividedGroups,
+                (group) => {
+                    StartFarmingSingleGroup(group, tokenSource.Token);
+                    FarmingProgress.Up();
+                }, (int)LaunchTimeManager.FarmingTime.TotalSeconds, tokenSource));
+            return TimeSpan.FromSeconds(dividedGroups.Count * (int)LaunchTimeManager.FarmingTime.TotalSeconds);
         }
 
-        private IEnumerable<IEnumerable<LaunchArgument>> GetDivivded(IEnumerable<LaunchArgument> args, int groupCnt)
+        private void StartFarmingSingleGroup(ArgsGroup group, CancellationToken cancellationToken)
+        {
+            CloseFarmApps();
+            _starter.StartArgs(group.LaunchArguments, cancellationToken);
+
+        }
+
+        private IEnumerable<ArgsGroup> GetDivivded(IEnumerable<LaunchArgument> args, int groupCnt)
         {
             List<List<LaunchArgument>> divided = new List<List<LaunchArgument>>();
             int cur = 0;
@@ -110,7 +131,15 @@ namespace GamesFarming.MVVM.Models
                     cur = 0;
                 }
             }
-            return divided;
+            foreach(var el in divided)
+            {
+                yield return new ArgsGroup(el);
+            }
+        }
+
+        public void CompleteEraly()
+        {
+            ArgsGroupsQueue.Stop();
         }
         public void CloseFarmApps()
         {
@@ -122,29 +151,29 @@ namespace GamesFarming.MVVM.Models
             }
             catch(Exception ex)
             {
-                MessageBox.Show("failed to close the programms! " + ex.Message);
+                MessageBox.Show("Failed to close the programms! " + ex.Message);
             }
         }
 
 
-        public void ClearCloudErrors(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken)
+        public async void ClearCloudErrors(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken)
         {
-            _starter.StartByArgs(args, cancellationToken,
-                (Action)(() =>
+            try
+            {
+                await Task.Run(() => _starter.StartClearing(args, cancellationToken));
+            }
+            catch (AggregateException ex)
+            {
+                foreach (Exception e in ex.InnerExceptions)
                 {
-                    Thread.Sleep(SteamLibrary.SteamAutorizationMilliSeconds);
-                    if (cancellationToken.IsCancellationRequested)
+                    if (e is OperationCanceledException)
                         return;
-                    Clicker.ExecuteClicks(GUIScenario.GetToCloud);
-                    if (ScreenCapture.PixelEquals(SteamLibrary.TickColor, GUIScenario.GetTick.First().Point))
-                        Clicker.ExecuteClicks(GUIScenario.GetTick);
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    Clicker.ExecuteClicks(GUIScenario.GetLeave);
-                    Thread.Sleep(SteamLibrary.SteamQuitWindowAwaitMilliSeconds);
-                    TaskManager.CloseProcces("steam");
-                    Thread.Sleep(7000);
-                }), null, (arg) => arg.SteamLaunch);
+                }
+                throw ex;
+            }
+            
         }
+
+
     }
 }

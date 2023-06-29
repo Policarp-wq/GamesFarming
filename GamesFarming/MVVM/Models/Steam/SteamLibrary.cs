@@ -8,7 +8,7 @@ namespace GamesFarming.MVVM.Models
     public static class SteamLibrary
     {
         public static int DefaultSteamLaunchMilliSeconds = DefaultSteamLaunchSeconds * 1000;
-        public const int MilliSecondsAfterLaucnh = 2000;
+        public const int MilliSecondsAfterLaucnh = 15000;
         public const int DefaultSteamLaunchSeconds = 10;
         public const int DefaultAccsInGroup = 10;
         public static int SteamLaunchSeconds => UserSettings.GetLaunchSeconds();

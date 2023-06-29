@@ -1,7 +1,10 @@
-﻿using GamesFarming.MVVM.Models.Server;
+﻿using GamesFarming.GUI;
+using GamesFarming.MVVM.Models.PC;
+using GamesFarming.MVVM.Models.Server;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,31 +14,21 @@ namespace GamesFarming.MVVM.Models
     internal class SteamStarter
     {
         private readonly ProcessStartInfo _guardProcces;
-        public string Path { get; private set; }
+        public string SteamPath { get; private set; }
 
-        public SteamStarter(string filePath)
+        public SteamStarter(string steamPath)
         {
-            Path = filePath;
+            SteamPath = steamPath;
             _guardProcces = new ProcessStartInfo
             {
                 FileName = SteamLibrary.GuardPath
             };
         }
 
-        public void StartByArgs(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onSteamLaunched, Action onStartEnd, Func<LaunchArgument, string> argToString)
-        {
-            List<Thread> threads = new List<Thread>();
-            foreach (var argument in args)
-            {
-                threads.Add(GetLaunchThread(argument, argToString, cancellationToken, onSteamLaunched));
-            }
-            StartThreads(threads, cancellationToken, () => onStartEnd?.Invoke());
-        }
-
-        public void StartByArgsInOrder(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken, Action onSteamLaunched, Action onStartEnd, Func<LaunchArgument, string> argToString)
+        public void StartArgs(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken)
         {
             var UserResolution = Resolution.GetUserResolution();
-            List<Thread> threads = new List<Thread>();
+            List<Task> sessions = new List<Task>();
             int posX = 0, posY = 0;
             int prevX = 0;
             int mxHeight = -1;
@@ -63,70 +56,75 @@ namespace GamesFarming.MVVM.Models
                     Connection connect = manager.GetNextConnect();
                     if (connect != null)
                         additionalArg += " " + connect.ToString();
-                }   
-                threads.Add(GetLaunchThread(argument, argToString, cancellationToken, onSteamLaunched, additionalArg));
+                }
+                ProcessStartInfo info = new ProcessStartInfo
+                {
+                    FileName = SteamPath,
+                    Arguments = argument.ToString() + additionalArg,
+                };
+                sessions.Add(new Task(() => GetGameSession(argument, info, cancellationToken)));
                 prevX = argument.Resolution.Width;
                 int prevY = argument.Resolution.Height;
                 mxHeight = Math.Max(mxHeight, prevY);
             }
-            StartThreads(threads, cancellationToken, () => onStartEnd?.Invoke());
+            StartSessions(sessions);    
         }
 
-        private Thread GetLaunchThread(LaunchArgument arg, Func<LaunchArgument, string> argToString, CancellationToken cancellationToken,
-            Action onSteamLaunched = null, string additional = "")
+        public void StartClearing(IEnumerable<LaunchArgument> args, CancellationToken cancellationToken)
         {
-            var steamProcces = new ProcessStartInfo
+            List<Task> sessions = new List<Task>();
+            foreach (var argument in args)
             {
-                FileName = Path,
-                Arguments = argToString(arg) + additional
-            };
-            Thread thread = new Thread(() =>
-            {
-                try
+                ProcessStartInfo info = new ProcessStartInfo
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    Process.Start(steamProcces);
-                    Thread.Sleep(SteamLibrary.SteamLaunchMilliSeconds);
-                    Clipboard.SetText(arg.Account.Login);
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    Process.Start(_guardProcces);
-                    Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
-                    arg.Account.LastLaunchDate = DateTime.Now;
-                    onSteamLaunched?.Invoke();
-                    Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            });
-            thread.IsBackground= true;
-            thread.SetApartmentState(ApartmentState.STA);
-            return thread;
+                    FileName = SteamPath,
+                    Arguments = argument.SteamLaunch
+                };
+                sessions.Add(new Task(() => GetCloudSession(argument, info, cancellationToken)));
+            }
+            StartSessions(sessions);
         }
 
-        private static void StartThreads(IEnumerable<Thread> launchProcesses, CancellationToken cancellationToken, Action onStartEnd = null)
+        private void StartSteam(LaunchArgument arg, ProcessStartInfo info, CancellationToken cancellationToken)
         {
-
-            Task launch = new Task(() =>
-            {
-                int cnt = 0;
-                foreach (var accountLaunch in launchProcesses)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                        break;
-                    accountLaunch.Start();
-                    accountLaunch.Join();
-                    cnt++;
-                }
-            }, cancellationToken);
-            launch.Start();
-            launch.Wait();
-            if (!cancellationToken.IsCancellationRequested)
-                onStartEnd?.Invoke();
+            info.UseShellExecute = false;
+            Process.Start(info);
+            new Thread(() => Clipboard.SetText(arg.Account.Login)) { ApartmentState = ApartmentState.STA }.Start();
+            Thread.Sleep(SteamLibrary.SteamLaunchMilliSeconds);
+            if (cancellationToken.IsCancellationRequested)
+                cancellationToken.ThrowIfCancellationRequested();
+            Process.Start(_guardProcces);
+            Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
         }
 
+        private void GetGameSession(LaunchArgument arg, ProcessStartInfo info, CancellationToken cancellationToken)
+        {
+            StartSteam(arg, info, cancellationToken);
+            arg.Account.LastLaunchDate = DateTime.Now;
+        }
+
+        private void GetCloudSession(LaunchArgument arg, ProcessStartInfo info, CancellationToken cancellationToken)
+        {
+            StartSteam(arg, info, cancellationToken);
+            Thread.Sleep(SteamLibrary.SteamAutorizationMilliSeconds);
+            if (cancellationToken.IsCancellationRequested)
+                cancellationToken.ThrowIfCancellationRequested();
+            Clicker.ExecuteClicks(GUIScenario.GetToCloud);
+            if (ScreenCapture.PixelEquals(SteamLibrary.TickColor, GUIScenario.GetTick.First().Point))
+                Clicker.ExecuteClicks(GUIScenario.GetTick);
+            Clicker.ExecuteClicks(GUIScenario.GetLeave);
+            Thread.Sleep(SteamLibrary.SteamQuitWindowAwaitMilliSeconds);
+            TaskManager.CloseProcces("steam");
+            Thread.Sleep(7000);
+        }
+
+        private void StartSessions(List<Task> sessions)
+        {
+            foreach(var session in sessions)
+            {
+                session.Start();
+                session.Wait();
+            }
+        }
     }
 }

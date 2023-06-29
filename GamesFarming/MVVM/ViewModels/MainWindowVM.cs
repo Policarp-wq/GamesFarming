@@ -1,10 +1,15 @@
-﻿using GamesFarming.DataBase;
+﻿using GamesFarming.CustomUI;
+using GamesFarming.DataBase;
 using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
 using GamesFarming.MVVM.Models;
+using GamesFarming.MVVM.Models.Facilities;
 using GamesFarming.MVVM.Stores;
 using GamesFarming.MVVM.Views;
 using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -21,6 +26,7 @@ namespace GamesFarming.MVVM.ViewModels
         public ICommand MoveToAccounts { get; set; }
         public ICommand MoveToServers { get; set; }
         public ICommand Import { get; set; }
+        public ICommand Export { get; set; }
         public ICommand OpenSettings { get; set; }
         public ICommand GetHelp { get; set; }
         public ICommand Close { get; set; }
@@ -44,8 +50,34 @@ namespace GamesFarming.MVVM.ViewModels
             MoveToServers = new RelayCommand(() => _navigationStore.CurrentVM = serversVM);
             MoveToRegistration = new RelayCommand(() => _navigationStore.CurrentVM = registerVM);
             Import = new RelayCommand(() => ImportFiles());
+            Export = new RelayCommand(() => InputBoxUI.ShowInputBox("Insert game code", (s) => AccountsExport(s)));
             OpenSettings = new RelayCommand(() => OnOpenSettings());
             GetHelp = new RelayCommand(() => MessageBox.Show(HelpMessage, "Info", MessageBoxButtons.OK));
+        }
+
+        private void AccountsExport(string s)
+        {
+            try
+            {
+                int code = int.Parse(s);
+                var selected = AccountsDB
+                    .GetItems()
+                    .Where(acc => acc.GameCode.Equals(code))
+                    .ToList();
+                StringBuilder exportText = new StringBuilder();
+                foreach (var acc in selected)
+                {
+                    exportText.AppendLine($"{acc.Login}:{acc.Password}");
+                }
+                FileInfo exportinfo = new FileInfo(
+                    Path.Combine(Environment.CurrentDirectory, "ExportedAccounts.txt"));
+                Exporter.ExportText(exportText.ToString(), exportinfo);
+                MessageBox.Show($"Accounts have been successfully exported to {exportinfo}");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void OnCurrentVMChanged()

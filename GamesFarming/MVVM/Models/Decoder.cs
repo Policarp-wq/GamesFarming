@@ -4,6 +4,11 @@ namespace GamesFarming.MVVM.Models
 {
     public static class Decoder
     {
+        public enum Codes
+        {
+            CSCode = 770,
+            TFCode = 440
+        }
         public const int CSCode = 730;
         public const int TFCode = 440;
         private static Dictionary<int, string> _gamesNames = new Dictionary<int, string>()

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GamesFarming.MVVM.Models.Facilities
 {
@@ -18,32 +20,53 @@ namespace GamesFarming.MVVM.Models.Facilities
     {
         private Queue<T> _queue;
         public Action<T> ActionWithElement { get; set; }
-        public int Seconds { get; set; }
+        public int TimerSeconds { get; set; }
         public readonly Timer QueueTimer;
 
         public event Action QueueIsEnded;
-        public TimeQueue(Action<T> actionWithElement, int seconds)
+        public CancellationTokenSource CancelationSource { get; private set; }
+        public TimeQueue()
         {
             _queue = new Queue<T>();
-            ActionWithElement = actionWithElement;
+            ActionWithElement = null;
+            CancelationSource = new CancellationTokenSource();
             QueueTimer = new Timer();
+            TimerSeconds = 1;
             QueueTimer.TimerStopped += () =>
             {
-                if (_queue.Count == 0)
+                if (_queue.Count == 0 || CancelationSource.IsCancellationRequested)
                 {
                     QueueIsEnded?.Invoke();
                     return;
                 }
-                ActionWithElement?.Invoke(_queue.Dequeue());
-                QueueTimer.Start(Seconds);
+                QueueTimer.Start(TimerSeconds);
             };
-            Seconds = seconds;
+            QueueTimer.TimerStarted += () =>
+            {
+                if (_queue.Count == 0 || CancelationSource.IsCancellationRequested)
+                {
+                    QueueIsEnded?.Invoke();
+                    return;
+                }
+                try
+                {
+                    ActionWithElement?.Invoke(_queue.Dequeue());
+                }
+                catch (AggregateException ex)
+                {
+                    QueueTimer.Stop();
+                }
+            };
         }
 
-        public void Start(IEnumerable<T> elements)
+        public void Start(IEnumerable<T> elements, Action<T> actionWithElement, int seconds, CancellationTokenSource source)
         {
             Add(elements);
-            QueueTimer.Start(Seconds);
+            CancelationSource = source;
+            source.Token.Register(() => QueueTimer.Stop());
+            ActionWithElement = actionWithElement;
+            TimerSeconds = seconds;
+            QueueTimer.Start(TimerSeconds);
         }
         public void Add(IEnumerable<T> elements)
         {

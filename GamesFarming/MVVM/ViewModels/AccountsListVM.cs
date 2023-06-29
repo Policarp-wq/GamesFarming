@@ -3,12 +3,14 @@ using GamesFarming.MVVM.Base;
 using GamesFarming.MVVM.Commands;
 using GamesFarming.MVVM.Models;
 using GamesFarming.MVVM.Models.Accounts;
+using GamesFarming.MVVM.Models.ASF;
 using GamesFarming.MVVM.Models.Steam;
 using GamesFarming.MVVM.Stores;
 using GamesFarming.User;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,9 +21,9 @@ namespace GamesFarming.MVVM.ViewModels
 {
     internal class AccountsListVM : ViewModelBase
     {
-
-        private CancellationTokenSource _cancellationTokenSource;
-        private readonly FarmingManager _manager;
+        public const string CommandsFile = "Commands.txt";
+        public CancellationTokenSource CancellationSource;
+        public readonly FarmingManager FarmingManager;
         public FilterableCollection<AccountPresentation> FilterableAccounts;
 
         public ObservableCollection<AccountPresentation> Accounts => FilterableAccounts.GetFiltered(new AccountPresentationComparer());
@@ -40,7 +42,7 @@ namespace GamesFarming.MVVM.ViewModels
             }
         }
         public FarmProgress FarmingProgress { get; set; }
-        public string StringTimer => TimeSpan.FromSeconds(_manager.LaunchTimer.CurrentSeconds).ToString();
+        public string StringTimer => TimeSpan.FromSeconds(FarmingManager.QueueTimer.CurrentSeconds).ToString();
 
         public int Minimum = 0;
         public int Maximum => FarmingProgress.AccountsCnt;
@@ -54,6 +56,7 @@ namespace GamesFarming.MVVM.ViewModels
         public ICommand Delete { get; set; }
         public ICommand GetInfo { get; set; }
         public ICommand Cancel { get; set; }
+        public ICommand CompleteFarming { get; set; }
         public ICommand ClearCloud { get; set; }
         public ICommand SelectAll { get; set; }
 
@@ -69,21 +72,22 @@ namespace GamesFarming.MVVM.ViewModels
             SelectedAccounts = new List<Account>();
             FarmingProgress = new FarmProgress();
             FarmingProgress.Updated += OnFarmingProgressUpdated;
-
-            _manager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress);
-            _manager.LaunchTimer.TimerTicked += () => OnPropertyChanged(nameof(StringTimer));
+            CancellationSource = new CancellationTokenSource();
+            FarmingManager = new FarmingManager(UserSettings.GetSteamPath(), FarmingProgress);
+            FarmingManager.QueueTimer.TimerTicked += () => OnPropertyChanged(nameof(StringTimer));
 
             Start = new RelayCommand(() => OnStart());
             Delete = new RelayCommand(() => DeleteAccounts());
             Cancel = new RelayCommand(() => OnCancel());
+            CompleteFarming = new RelayCommand(() => OnCompleteFarming());
             ClearCloud = new RelayCommand(() => OnClearCloud()); 
             GetInfo = new ParamCommand(p => OnGetInfo(p));
             SelectAll = new RelayCommand(() => OnSelectAll());
-            _cancellationTokenSource = new CancellationTokenSource();
             Accounts.CollectionChanged += OnAccountsChanged;
 
             StartFarmReadyCheck();
         }
+
 
         private void OnFarmingProgressUpdated()
         {
@@ -114,15 +118,15 @@ namespace GamesFarming.MVVM.ViewModels
 
         public async void StartFarmReadyCheck()
         {
-            const int hoursTick = 1;
-            await Task.Run(() =>
-            {
-                while (true)
-                {
-                    Check();
-                    Thread.Sleep(hoursTick * 3600 * 1000);
-                }
-            });
+            //const int hoursTick = 1;
+            //await Task.Run(() =>
+            //{
+            //    while (true)
+            //    {
+            //        Check();
+            //        Thread.Sleep(hoursTick * 3600 * 1000);
+            //    }
+            //});
         }
 
         public void Check()
@@ -150,20 +154,24 @@ namespace GamesFarming.MVVM.ViewModels
             }
         }
 
-        public void OnStart()
+        public async void OnStart()
         {
             try
             {
-                _cancellationTokenSource = new CancellationTokenSource();
+                CancellationSource = new CancellationTokenSource();
                 var selectedArgs = new List<LaunchArgument>(SelectedAccounts.Select(acc => new LaunchArgument(acc)));
-                var farmTime = _manager.StartFarming(selectedArgs, _cancellationTokenSource.Token, () =>
+                if (selectedArgs.Count == 0)
+                    return;
+                var farmTime = await FarmingManager.StartFarming(selectedArgs, CancellationSource, () =>
                 {
-                    Update();
-                    if (!_cancellationTokenSource.IsCancellationRequested)
+                    SaveLootCommand(ASFCommands.LootAccounts(selectedArgs.Select(acc => acc.Account.Login).ToList(),
+                        selectedArgs.First().Account.GameCode));
+                    if (!CancellationSource.IsCancellationRequested)
                     {
                          UpdateLaunchTime(selectedArgs.Select(x => x.Account));
                          NavigationStore.TrayIcon.ShowBalloonTip(3, "Success", "Selected accounts has been farmed", System.Windows.Forms.ToolTipIcon.Info);
                     }
+                    Update();
                 });
                 NavigationStore.TrayIcon.ShowBalloonTip(5, "Start", $"Farming has started with {selectedArgs.Count} accounts for {farmTime}",
                                     System.Windows.Forms.ToolTipIcon.Info);
@@ -175,17 +183,21 @@ namespace GamesFarming.MVVM.ViewModels
             
         }
 
+        private void OnCompleteFarming()
+        {
+            FarmingManager.CompleteEraly();
+        }
         public void OnCancel()
         {
             try
             {
-                _cancellationTokenSource?.Cancel();
-                _cancellationTokenSource?.Dispose();
-                _manager.CloseFarmApps();
+                CancellationSource?.Cancel();
+                CancellationSource?.Dispose();
+                FarmingManager.CloseFarmApps();
                 SelectedAccounts.Clear();
                 Update();
             }
-            catch(ObjectDisposedException)
+            catch(OperationCanceledException)
             {
                 
             }
@@ -194,11 +206,26 @@ namespace GamesFarming.MVVM.ViewModels
                 MessageBox.Show(ex.Message);
             }
         }
+
+        private void SaveLootCommand(string command)
+        {
+            try
+            {
+                FileSafeAccess.AddLineToFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), CommandsFile),
+                                command);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error occured while saving commands:" + ex.Message);
+            }
+            
+        }
+
         public void OnClearCloud()
         {
-            _cancellationTokenSource = new CancellationTokenSource();
+            CancellationSource = new CancellationTokenSource();
             var selectedArgs = SelectedAccounts.Select(acc => new LaunchArgument(acc));
-            _manager.ClearCloudErrors(selectedArgs, _cancellationTokenSource.Token);
+            FarmingManager.ClearCloudErrors(selectedArgs, CancellationSource.Token);
         }
 
         public void SetFilter()
@@ -233,7 +260,7 @@ namespace GamesFarming.MVVM.ViewModels
 
         public void UpdateLaunchTime(IEnumerable<Account> usedAccs)
         {
-            if(_cancellationTokenSource.IsCancellationRequested)
+            if(CancellationSource.IsCancellationRequested)
                 return;
             List<Account> updatedAccs = new List<Account>();
             foreach(var acc in FilterableAccounts.Items.Select(item => item.Account))

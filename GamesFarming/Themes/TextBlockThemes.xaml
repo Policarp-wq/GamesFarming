@@ -10,4 +10,5 @@
     <Style TargetType="TextBlock" x:Key="Sign" BasedOn="{StaticResource StandartTextBlock}">
         <Setter Property="Background" Value="Transparent"/>
     </Style>
+
 </ResourceDictionary>

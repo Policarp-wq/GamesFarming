@@ -235,22 +235,28 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CustomUI\InputBoxUI.cs" />
     <Compile Include="DataBase\DBAccess.cs" />
     <Compile Include="DataBase\DBKeys.cs" />
     <Compile Include="GUI\Clicker.cs" />
     <Compile Include="GUI\ClickInfo.cs" />
     <Compile Include="GUI\GUIScenario.cs" />
     <Compile Include="GUI\ScreenCapture.cs" />
+    <Compile Include="CustomUI\InputBox.xaml.cs">
+      <DependentUpon>InputBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MVVM\Commands\ParamCommand.cs" />
     <Compile Include="MVVM\Converters\PresentationConverter.cs" />
     <Compile Include="MVVM\Models\Accounts\AccountPresentationComparer.cs" />
     <Compile Include="MVVM\Models\Accounts\Filters.cs" />
+    <Compile Include="MVVM\Models\ASF\ASFCommands.cs" />
     <Compile Include="MVVM\Models\BatDeserializer.cs" />
+    <Compile Include="MVVM\Models\Facilities\Exporter.cs" />
     <Compile Include="MVVM\Models\Facilities\TimeQueue.cs" />
     <Compile Include="MVVM\Models\Steam\ConfigReader.cs" />
     <Compile Include="MVVM\Models\PC\TaskManager.cs" />
     <Compile Include="MVVM\Models\Server\Connection.cs" />
-    <Compile Include="MVVM\Models\FileSafeAccess.cs" />
+    <Compile Include="MVVM\Models\Facilities\FileSafeAccess.cs" />
     <Compile Include="MVVM\Models\Decoder.cs" />
     <Compile Include="MVVM\Models\FilterableCollection.cs" />
     <Compile Include="MVVM\Models\Server\ConnectionManager.cs" />
@@ -261,10 +267,14 @@
     <Compile Include="MVVM\Models\Steam\LaunchTimeManager.cs" />
     <Compile Include="MVVM\Models\Validator.cs" />
     <Compile Include="MVVM\Models\Facilities\Timer.cs" />
+    <Compile Include="CustomUI\InputBoxViewModel.cs" />
     <Compile Include="MVVM\ViewModels\ServerRegistartionVM.cs" />
     <Compile Include="MVVM\ViewModels\ServersListVM.cs" />
     <Compile Include="MVVM\ViewModels\SettingsVM.cs" />
     <Compile Include="MVVM\ViewModels\TimerVM.cs" />
+    <Compile Include="MVVM\Views\InputBoxView.xaml.cs">
+      <DependentUpon>InputBoxView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MVVM\Views\ServerRegistrationView.xaml.cs">
       <DependentUpon>ServerRegistrationView.xaml</DependentUpon>
     </Compile>
@@ -278,6 +288,10 @@
       <DependentUpon>TimerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="User\UserSettings.cs" />
+    <Page Include="CustomUI\InputBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -299,6 +313,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MVVM\Views\InputBoxView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MVVM\Views\ServerRegistrationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -312,6 +330,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MVVM\Views\TimerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Templates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

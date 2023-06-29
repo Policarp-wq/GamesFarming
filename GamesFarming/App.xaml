@@ -20,6 +20,7 @@
                 <ResourceDictionary Source="Themes/TextBoxThemes.xaml"/>
                 <ResourceDictionary Source="Themes/ButtonThemes.xaml"/>
                 <ResourceDictionary Source="Themes/ImageThemes.xaml"/>
+                <ResourceDictionary Source="Templates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

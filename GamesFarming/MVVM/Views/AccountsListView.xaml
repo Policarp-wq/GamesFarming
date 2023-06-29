@@ -24,7 +24,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
-            <ColumnDefinition />
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid Margin="10"
             Grid.ColumnSpan="5"
@@ -67,7 +67,7 @@
                      Grid.Column="4"
                      Text="{Binding StringTimer}"/>
         <ListView Grid.Row="2"
-            Grid.ColumnSpan="5"
+            Grid.ColumnSpan="4"
                   x:Name="ListView1"
             Margin="10" ItemsSource="{Binding Accounts}"
                   SelectionMode="Extended"
@@ -81,6 +81,7 @@
                             <ColumnDefinition Width="300"/>
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="50"/>
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0"
@@ -118,6 +119,20 @@
                                 </MultiBinding>
                             </Button.CommandParameter>
                         </Button>
+                        <Button Grid.Column="4"
+                            Margin="10"
+                                MaxWidth="30"
+                                MaxHeight="30"
+                                Command="{Binding ElementName=ListView1, Path=DataContext.GetInfo}"
+                                Content="/">
+
+                            <Button.CommandParameter>
+                                <MultiBinding Converter="{StaticResource presentationConverter}">
+                                    <Binding Path="Login"/>
+                                    <Binding Path="GameCode"/>
+                                </MultiBinding>
+                            </Button.CommandParameter>
+                        </Button>
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -128,35 +143,144 @@
                 
             </ListView.Resources>
         </ListView>
-        <Button Grid.Row="3"
-                Grid.Column="0"
+        <Menu Grid.Column="4"
+              Grid.Row="2"
+              Background="Transparent">
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+            <MenuItem Background="LightGreen"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                      Margin="5"
+                      Command="{Binding Start}">
+                <MenuItem.Header>
+                    <TextBlock Text="Start"
+                               FontSize="22"
+                               TextAlignment="Left"
+                               MinWidth="100"/>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem 
+                      Background="IndianRed"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                      Margin="5"
+                >
+                <MenuItem.Header>
+                    <TextBlock Text="Stop"
+                               FontSize="22"
+                               TextAlignment="Left"
+                               MinWidth="100"/>
+                </MenuItem.Header>
+                <MenuItem Background="LightGreen"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                     Margin="5"
+                     Command="{Binding CompleteFarming}">
+                    <MenuItem.Header>
+                        <TextBlock Text="Complete farming"
+                               FontSize="22"
+                               TextAlignment="Left"
+                               MinWidth="100"/>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Background="IndianRed"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                      Command="{Binding Cancel}"
+                          Margin="5">
+                    <MenuItem.Header
+                        >
+                        <TextBlock Text="Cancel launch"
+                               FontSize="22"
+                               TextAlignment="Left"
+                               MinWidth="100"/>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Background="Yellow"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                      Margin="5"
+                      Command="{Binding ClearCloud}">
+                <MenuItem.Header>
+                    <TextBlock Text="Clear cloud"
+                               FontSize="22"
+                               TextAlignment="Left"
+                               MinWidth="100"/>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem Background="OrangeRed"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                      Margin="5"
+                      Command="{Binding Delete}">
+                <MenuItem.Header>
+                    <TextBlock Text="Remove"
+                               FontSize="22"
+                               TextAlignment="Left"
+                               MinWidth="100"/>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem Background="YellowGreen"
+                      BorderBrush="Gray"
+                      BorderThickness="1"
+                      Margin="5"
+                      Command="{Binding SelectAll}">
+                <MenuItem.Header>
+                    <TextBlock Text="Select all"
+                               FontSize="22"
+                               TextAlignment="Left"
+                               MinWidth="100"/>
+                </MenuItem.Header>
+            </MenuItem>
+        </Menu>
+        <!--<StackPanel Grid.Column="4"
+                    Grid.Row="2"
+                    Orientation="Vertical">
+            <Button 
                 Margin="10"
             Content="Start" MaxWidth="150"
                 Background="LightGreen"
                 Command="{Binding Start}"/>
-        <Button Grid.Row="3"
-                Grid.Column="1"
+            <Menu
+                Background="Transparent">
+                <MenuItem
                 Margin="10"
-            Content="Cancel launch" MaxWidth="220"
-                Background="LightSkyBlue"
-                Command="{Binding Cancel}"/>
-        <Button Grid.Row="3"
-                Grid.Column="2"
+                MaxWidth="150"
+                Background="#a881af">
+                    <MenuItem.Header>
+                        <TextBlock Text="Stop "
+                               TextWrapping="Wrap"/>
+                    </MenuItem.Header>
+                    <MenuItem>
+                        <Button 
+                         Margin="10"
+                         Content="Cancel launch" MaxWidth="220"
+                         Background="LightSkyBlue"
+                         Command="{Binding Cancel}"/>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+            <Button 
                 Margin="10"
             Content="Remove" MaxWidth="150"
                 Background="IndianRed"
                 Command="{Binding Delete}"/>
-        <Button Grid.Row="3"
-                Grid.Column="3"
+            <Button 
                 Margin="10"
             Content="Clear cloud" MaxWidth="150"
                 Background="LightGoldenrodYellow"
                 Command="{Binding ClearCloud}"/>
-        <Button Grid.Row="3"
-                Grid.Column="4"
+            <Button 
                 Margin="10"
             Content="Select all" MaxWidth="150"
                 Background="MediumSeaGreen"
                 Command="{Binding SelectAll}"/>
+        </StackPanel>-->
+        
     </Grid>
 </UserControl>
