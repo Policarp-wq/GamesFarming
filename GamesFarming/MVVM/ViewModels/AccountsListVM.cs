@@ -142,18 +142,20 @@ namespace GamesFarming.MVVM.ViewModels
                     System.Windows.Forms.ToolTipIcon.Info);
         }
 
-        public void OnSelectAll()
+        public async void OnSelectAll()
         {
             int selectdID = -1;
             if (SelectedAccounts.Count > 0)
                 selectdID = SelectedAccounts.First().GameCode;
-            for(int i = 0; i < Accounts.Count; ++i)
+            await Task.Run(() =>
             {
-                if (selectdID == -1 || Accounts[i].GameCode == selectdID)
-                    Accounts[i].Selected = true;
-            }
+                for (int i = 0; i < Accounts.Count; ++i)
+                {
+                    if (selectdID == -1 || Accounts[i].GameCode == selectdID)
+                        Accounts[i].Selected = true;
+                }
+            });
         }
-
         public async void OnStart()
         {
             try
@@ -164,23 +166,34 @@ namespace GamesFarming.MVVM.ViewModels
                     return;
                 var farmTime = await FarmingManager.StartFarming(selectedArgs, CancellationSource, () =>
                 {
-                    SaveLootCommand(ASFCommands.LootAccounts(selectedArgs.Select(acc => acc.Account.Login).ToList(),
-                        selectedArgs.First().Account.GameCode));
                     if (!CancellationSource.IsCancellationRequested)
                     {
-                         UpdateLaunchTime(selectedArgs.Select(x => x.Account));
-                         NavigationStore.TrayIcon.ShowBalloonTip(3, "Success", "Selected accounts has been farmed", System.Windows.Forms.ToolTipIcon.Info);
+                        UpdateLaunchTime(selectedArgs.Select(x => x.Account));
+                        NavigationStore.TrayIcon.ShowBalloonTip(3, "Success", "Selected accounts has been farmed", System.Windows.Forms.ToolTipIcon.Info);
+                        SaveLootCommand(ASFCommands.LootAccounts(selectedArgs.Select(acc => acc.Account.Login).ToList(),
+                       selectedArgs.First().Account.GameCode));
                     }
-                    Update();
                 });
                 NavigationStore.TrayIcon.ShowBalloonTip(5, "Start", $"Farming has started with {selectedArgs.Count} accounts for {farmTime}",
                                     System.Windows.Forms.ToolTipIcon.Info);
             }
-            catch (System.Exception ex)
+            catch (AggregateException ex)
             {
-                MessageBox.Show(ex.Message);
+                foreach (Exception e in ex.InnerExceptions)
+                {
+                    if (e is OperationCanceledException)
+                        return;
+                }
+                throw ex;
             }
-            
+            catch (Exception ex)
+            {
+                MessageBox.Show("Exception caused on farming: " + ex.InnerException.Message);
+            }
+            finally
+            {
+                Update();
+            }
         }
 
         private void OnCompleteFarming()
@@ -196,10 +209,6 @@ namespace GamesFarming.MVVM.ViewModels
                 FarmingManager.CloseFarmApps();
                 SelectedAccounts.Clear();
                 Update();
-            }
-            catch(OperationCanceledException)
-            {
-                
             }
             catch(Exception ex)
             {

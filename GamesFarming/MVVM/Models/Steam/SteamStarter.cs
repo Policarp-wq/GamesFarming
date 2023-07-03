@@ -93,7 +93,7 @@ namespace GamesFarming.MVVM.Models
             Thread.Sleep(SteamLibrary.SteamLaunchMilliSeconds);
             if (cancellationToken.IsCancellationRequested)
                 cancellationToken.ThrowIfCancellationRequested();
-            Process.Start(_guardProcces);
+            //PasteGuard(arg.Account);
             Thread.Sleep(SteamLibrary.MilliSecondsAfterLaucnh);
         }
 

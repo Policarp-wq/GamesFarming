@@ -48,14 +48,7 @@ namespace GamesFarming.MVVM.Models.Facilities
                     QueueIsEnded?.Invoke();
                     return;
                 }
-                try
-                {
-                    ActionWithElement?.Invoke(_queue.Dequeue());
-                }
-                catch (AggregateException ex)
-                {
-                    QueueTimer.Stop();
-                }
+                ActionWithElement?.Invoke(_queue.Dequeue());
             };
         }
 

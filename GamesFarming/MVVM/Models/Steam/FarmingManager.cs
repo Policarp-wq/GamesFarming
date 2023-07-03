@@ -107,7 +107,6 @@ namespace GamesFarming.MVVM.Models
         {
             CloseFarmApps();
             _starter.StartArgs(group.LaunchArguments, cancellationToken);
-
         }
 
         private IEnumerable<ArgsGroup> GetDivivded(IEnumerable<LaunchArgument> args, int groupCnt)

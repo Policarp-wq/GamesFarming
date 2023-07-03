@@ -149,6 +149,9 @@
     <Reference Include="Perfolizer, Version=0.2.1.0, Culture=neutral, PublicKeyToken=e864f2ec9c0b6d4c, processorArchitecture=MSIL">
       <HintPath>..\packages\Perfolizer.0.2.1\lib\netstandard2.0\Perfolizer.dll</HintPath>
     </Reference>
+    <Reference Include="SteamAuth, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SteamAuth.3.0.0\lib\net45\SteamAuth.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -238,6 +241,7 @@
     <Compile Include="CustomUI\InputBoxUI.cs" />
     <Compile Include="DataBase\DBAccess.cs" />
     <Compile Include="DataBase\DBKeys.cs" />
+    <Compile Include="Guard\GuardCodeGenerator.cs" />
     <Compile Include="GUI\Clicker.cs" />
     <Compile Include="GUI\ClickInfo.cs" />
     <Compile Include="GUI\GUIScenario.cs" />
